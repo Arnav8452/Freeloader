@@ -11,6 +11,7 @@ services:
       - NODE_ENV=production
       - REDIS_URL=redis://redis:6379
       # Users will inject their API keys here
+      - FREELOADER_API_KEYS=${FREELOADER_API_KEYS:-625faa3fbbc3d2bd9d6ee7678d04cc5339cb33dc68d9b58451853d60046e226a}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
       - GROQ_API_KEY=${GROQ_API_KEY:-}
       - CEREBRAS_API_KEY=${CEREBRAS_API_KEY:-}
