@@ -1,0 +1,8 @@
+node_modules
+.pnpm-store
+.git
+.turbo
+dist
+.next
+.env
+.DS_Store

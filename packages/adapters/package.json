@@ -1,6 +1,20 @@
 {
   "name": "@freeloader/adapters",
   "version": "0.1.0",
+  "description": "Provider adapters (Gemini, Groq, Cerebras, etc.) for the Freeloader AI Gateway.",
+  "author": "Arnav",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Arnav8452/Freeloader.git",
+    "directory": "packages/adapters"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {

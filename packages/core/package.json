@@ -1,6 +1,20 @@
 {
   "name": "@freeloader/core",
   "version": "0.1.0",
+  "description": "Core resilience, caching, and routing logic for the Freeloader AI Gateway.",
+  "author": "Arnav",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Arnav8452/Freeloader.git",
+    "directory": "packages/core"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
