@@ -1,7 +1,0 @@
----
-"@freeloaderapi/adapters": minor
-"@freeloaderapi/core": minor
-"@freeloaderapi/gateway": minor
----
-
-Initial productized release

@@ -1,6 +1,6 @@
 {
   "name": "@freeloaderapi/adapters",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Provider adapters (Gemini, Groq, Cerebras, etc.) for the Freeloader AI Gateway.",
   "author": "Arnav",
   "license": "MIT",
