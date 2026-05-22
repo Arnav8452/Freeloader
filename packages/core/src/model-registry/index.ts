@@ -7,17 +7,17 @@ const modelMappings: VirtualModelMapping[] = [
   {
     requestedModel: 'gpt-4o',
     providerModelMap: {
-      gemini: 'gemini-1.5-pro',
-      groq: 'llama3-70b-8192',
-      cerebras: 'llama3.1-70b',
+      gemini: 'gemini-1.5-flash-latest',
+      groq: 'llama-3.1-8b-instant',
+      cerebras: 'llama3.1-8b',
       openrouter: 'openrouter/auto',
     }
   },
   {
     requestedModel: 'gpt-4o-mini',
     providerModelMap: {
-      gemini: 'gemini-1.5-flash',
-      groq: 'llama3-8b-8192',
+      gemini: 'gemini-1.5-flash-latest',
+      groq: 'llama-3.1-8b-instant',
       cerebras: 'llama3.1-8b',
       openrouter: 'meta-llama/llama-3-8b-instruct:free',
     }
@@ -25,8 +25,8 @@ const modelMappings: VirtualModelMapping[] = [
   {
     requestedModel: 'gpt-3.5-turbo',
     providerModelMap: {
-      gemini: 'gemini-1.5-flash',
-      groq: 'mixtral-8x7b-32768',
+      gemini: 'gemini-1.5-flash-latest',
+      groq: 'llama-3.1-8b-instant',
       cerebras: 'llama3.1-8b',
       openrouter: 'openrouter/auto',
     }
@@ -34,9 +34,9 @@ const modelMappings: VirtualModelMapping[] = [
   {
     requestedModel: 'claude-3-5-sonnet',
     providerModelMap: {
-      gemini: 'gemini-1.5-pro',
-      groq: 'llama3-70b-8192',
-      cerebras: 'llama3.1-70b',
+      gemini: 'gemini-1.5-flash-latest',
+      groq: 'llama-3.1-8b-instant',
+      cerebras: 'llama3.1-8b',
       openrouter: 'anthropic/claude-3.5-sonnet:beta',
     }
   }
