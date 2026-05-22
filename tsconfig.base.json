@@ -11,10 +11,6 @@
     "forceConsistentCasingInFileNames": true,
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
-    "isolatedModules": true,
-    "baseUrl": ".",
-    "paths": {
-      "@freeloader/*": ["packages/*/src"]
-    }
+    "isolatedModules": true
   }
 }
