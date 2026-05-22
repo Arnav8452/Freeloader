@@ -61,7 +61,7 @@ export async function authMiddleware(request: FastifyRequest, reply: FastifyRepl
       });
     }
   } catch (err) {
-    request.log.error('Rate limiter failed, failing open for availability', err);
+    request.log.error(err, 'Rate limiter failed, failing open for availability');
     // In infrastructure, if Redis fails, you typically fail open (allow request) to prevent total outages
   }
 }

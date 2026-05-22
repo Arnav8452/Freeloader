@@ -66,7 +66,7 @@ export class CircuitBreaker {
       // In half-open, we only allow one ticket at a time.
       // We can use a simple atomic flag to ensure only one probe request goes through.
       const probeFlagKey = `cb:${this.providerName}:probe`;
-      const acquired = await this.redis.set(probeFlagKey, '1', 'NX', 'PX', this.config.recoveryTimeoutMs);
+      const acquired = await this.redis.set(probeFlagKey, '1', 'PX', this.config.recoveryTimeoutMs, 'NX');
       
       if (!acquired) {
          throw new Error(`Circuit breaker is HALF_OPEN for provider: ${this.providerName}, probe request already dispatched.`);

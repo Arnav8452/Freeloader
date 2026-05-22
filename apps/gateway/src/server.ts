@@ -1,10 +1,21 @@
 import fastify from 'fastify';
+import { authMiddleware } from './middleware/auth';
+import completionsRoute from './routes/v1/chat/completions';
 
 const server = fastify({ logger: true });
+
+// Register Auth Middleware globally
+server.addHook('preHandler', async (request, reply) => {
+  // Exclude health endpoints from auth
+  if (request.url.startsWith('/health')) return;
+  await authMiddleware(request, reply);
+});
 
 server.get('/health', async (request, reply) => {
   return { status: 'ok', uptime: process.uptime() };
 });
+
+server.register(completionsRoute);
 
 const start = async () => {
   try {
