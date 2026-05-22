@@ -2,6 +2,7 @@ import { GatewayRequest, GatewayResponse, GatewayStreamChunk, IProvider } from '
 import { RequestClassifier } from './classifier';
 import { RoutingEngine, RoutingStrategy } from '../routing/engine';
 import { ModelRegistry } from '../model-registry';
+import { CircuitBreaker } from '../circuit-breaker';
 
 export class PipelineOrchestrator {
   private routingEngine: RoutingEngine;
@@ -46,6 +47,16 @@ export class PipelineOrchestrator {
       // Abort early if the client disconnected
       if (signal?.aborted) throw new Error('Request aborted by client');
 
+      const breaker = new CircuitBreaker(provider.name);
+
+      try {
+        await breaker.acquireTicket();
+      } catch (err: any) {
+        // Circuit is open, skip this provider
+        console.log(`[Freeloader] Skipping provider ${provider.name} (Circuit Open)`);
+        continue;
+      }
+
       try {
         // Model Virtualization: Translate requested model to provider-specific model
         const actualModel = request.model ? ModelRegistry.resolveForProvider(request.model, provider.name) : undefined;
@@ -56,13 +67,15 @@ export class PipelineOrchestrator {
         // Attempt the execution
         const response = await provider.chatCompletion(providerRequest, signal);
         
+        await breaker.recordSuccess();
+
         // Successfully executed, return immediately
         return response;
       } catch (err: any) {
         lastError = err;
         // Log failure for this provider and continue to the next one in the cascade
         console.warn(`[Freeloader] Provider ${provider.name} failed:`, err.message);
-        // Note: In a full implementation, we'd also trigger the Circuit Breaker to record this failure
+        await breaker.recordFailure();
       }
     }
 
@@ -98,6 +111,15 @@ export class PipelineOrchestrator {
     for (const { provider } of scoredProviders) {
       if (signal?.aborted) throw new Error('Request aborted by client');
 
+      const breaker = new CircuitBreaker(provider.name);
+
+      try {
+        await breaker.acquireTicket();
+      } catch (err: any) {
+        console.log(`[Freeloader] Skipping provider ${provider.name} for stream (Circuit Open)`);
+        continue;
+      }
+
       const actualModel = request.model ? ModelRegistry.resolveForProvider(request.model, provider.name) : undefined;
       const providerRequest = { ...request, model: actualModel };
 
@@ -107,7 +129,11 @@ export class PipelineOrchestrator {
         const stream = provider.chatCompletionStream(providerRequest, signal);
 
         for await (const chunk of stream) {
-          streamGeneratedBytes = true; // Once we yield, we CANNOT retry
+          if (!streamGeneratedBytes) {
+             streamGeneratedBytes = true; // Once we yield, we CANNOT retry
+             // We consider the first successful byte as a success for the breaker
+             await breaker.recordSuccess();
+          }
           yield chunk;
         }
 
@@ -124,7 +150,8 @@ export class PipelineOrchestrator {
           throw new Error(`[Freeloader] Stream interrupted mid-flight from ${provider.name}: ${err.message}`);
         }
         
-        // If we haven't yielded any bytes yet, it's safe to continue the loop and failover.
+        // If we haven't yielded any bytes yet, it's safe to record failure, continue the loop and failover.
+        await breaker.recordFailure();
       }
     }
 

@@ -1,6 +1,6 @@
 import fastify from 'fastify';
-import { authMiddleware } from './middleware/auth';
-import completionsRoute from './routes/v1/chat/completions';
+import { authMiddleware } from './middleware/auth.js';
+import completionsRoute from './routes/v1/chat/completions.js';
 
 const server = fastify({ logger: true });
 

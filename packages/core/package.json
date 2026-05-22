@@ -5,7 +5,7 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "jest",
+    "test": "node --import tsx --test src/__tests__/**/*.test.ts",
     "dev": "tsc --watch",
     "lint": "eslint src/"
   },

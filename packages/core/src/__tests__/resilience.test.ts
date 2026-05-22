@@ -1,17 +1,13 @@
+import assert from 'node:assert/strict';
+import { beforeEach, describe, it } from 'node:test';
 import RedisMock from 'ioredis-mock';
+import type Redis from 'ioredis';
 import { CircuitBreaker, CircuitBreakerState } from '../circuit-breaker';
 import { RateLimiter } from '../rate-limiter';
 import { RedisClient } from '../redis/client';
 
-// Mock the Redis singleton
 const mockRedis = new RedisMock();
-jest.mock('../redis/client', () => {
-  return {
-    RedisClient: {
-      getInstance: () => mockRedis
-    }
-  };
-});
+RedisClient.setInstance(mockRedis as unknown as Redis);
 
 describe('CircuitBreaker', () => {
   beforeEach(async () => {
@@ -21,48 +17,45 @@ describe('CircuitBreaker', () => {
   it('starts in CLOSED state', async () => {
     const cb = new CircuitBreaker('test-provider');
     const state = await cb.getState();
-    expect(state).toBe(CircuitBreakerState.CLOSED);
+    assert.equal(state, CircuitBreakerState.CLOSED);
   });
 
   it('opens circuit after reaching failure threshold', async () => {
     const cb = new CircuitBreaker('test-provider', { failureThreshold: 3, recoveryTimeoutMs: 1000 });
-    
-    await cb.recordFailure();
-    await cb.recordFailure();
-    expect(await cb.getState()).toBe(CircuitBreakerState.CLOSED);
-    
-    await cb.recordFailure();
-    expect(await cb.getState()).toBe(CircuitBreakerState.OPEN);
 
-    // Should throw on acquire
-    await expect(cb.acquireTicket()).rejects.toThrow(/OPEN/);
+    await cb.recordFailure();
+    await cb.recordFailure();
+    assert.equal(await cb.getState(), CircuitBreakerState.CLOSED);
+
+    await cb.recordFailure();
+    assert.equal(await cb.getState(), CircuitBreakerState.OPEN);
+
+    await assert.rejects(() => cb.acquireTicket(), /OPEN/);
   });
 
   it('transitions to HALF_OPEN after recovery timeout', async () => {
-    const cb = new CircuitBreaker('test-provider', { failureThreshold: 1, recoveryTimeoutMs: 100 }); // 100ms
-    
-    await cb.recordFailure();
-    expect(await cb.getState()).toBe(CircuitBreakerState.OPEN);
+    const cb = new CircuitBreaker('test-provider', { failureThreshold: 1, recoveryTimeoutMs: 100 });
 
-    // Wait for timeout
+    await cb.recordFailure();
+    assert.equal(await cb.getState(), CircuitBreakerState.OPEN);
+
     await new Promise(resolve => setTimeout(resolve, 150));
 
-    expect(await cb.getState()).toBe(CircuitBreakerState.HALF_OPEN);
+    assert.equal(await cb.getState(), CircuitBreakerState.HALF_OPEN);
 
-    // Should allow exactly one probe request
     await cb.acquireTicket();
-    await expect(cb.acquireTicket()).rejects.toThrow(/HALF_OPEN/); // Second ticket should fail
+    await assert.rejects(() => cb.acquireTicket(), /HALF_OPEN/);
   });
 
   it('closes circuit if probe succeeds', async () => {
     const cb = new CircuitBreaker('test-provider', { failureThreshold: 1, recoveryTimeoutMs: 100 });
     await cb.recordFailure();
-    
+
     await new Promise(resolve => setTimeout(resolve, 150));
-    expect(await cb.getState()).toBe(CircuitBreakerState.HALF_OPEN);
+    assert.equal(await cb.getState(), CircuitBreakerState.HALF_OPEN);
 
     await cb.recordSuccess();
-    expect(await cb.getState()).toBe(CircuitBreakerState.CLOSED);
+    assert.equal(await cb.getState(), CircuitBreakerState.CLOSED);
   });
 });
 
@@ -73,18 +66,18 @@ describe('RateLimiter', () => {
 
   it('allows requests under limit', async () => {
     const limiter = new RateLimiter();
-    const config = { requestsPerMinute: 2, burstLimit: 2 };
-    
+    const config = { requestsPerMinute: 2 };
+
     const req1 = await limiter.checkLimit('user1', config);
-    expect(req1.allowed).toBe(true);
-    expect(req1.remaining).toBe(1);
+    assert.equal(req1.allowed, true);
+    assert.equal(req1.remaining, 1);
 
     const req2 = await limiter.checkLimit('user1', config);
-    expect(req2.allowed).toBe(true);
-    expect(req2.remaining).toBe(0);
+    assert.equal(req2.allowed, true);
+    assert.equal(req2.remaining, 0);
 
     const req3 = await limiter.checkLimit('user1', config);
-    expect(req3.allowed).toBe(false);
-    expect(req3.remaining).toBe(0);
+    assert.equal(req3.allowed, false);
+    assert.equal(req3.remaining, 0);
   });
 });

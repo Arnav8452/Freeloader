@@ -27,5 +27,11 @@ jobs:
     - name: Install dependencies
       run: pnpm install
       
-    - name: Build monorepo
+    - name: Build Turbo
       run: pnpm build
+
+    - name: Lint
+      run: pnpm lint
+
+    - name: Test Core Resilience Logic
+      run: pnpm test

@@ -6,15 +6,18 @@
     "build": "tsc",
     "dev": "tsc --watch & node dist/server.js",
     "start": "node dist/server.js",
+    "test": "node --import tsx --test src/__tests__/**/*.test.ts",
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@freeloader/core": "workspace:*",
     "@freeloader/adapters": "workspace:*",
+    "@freeloader/core": "workspace:*",
     "fastify": "^4.26.1"
   },
   "devDependencies": {
-    "typescript": "^5.4.0",
-    "@types/node": "^20.0.0"
+    "@types/ioredis-mock": "^8.2.7",
+    "@types/node": "^20.0.0",
+    "ioredis-mock": "^8.13.1",
+    "typescript": "^5.4.0"
   }
 }

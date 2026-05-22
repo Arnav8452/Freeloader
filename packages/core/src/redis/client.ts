@@ -1,7 +1,7 @@
 import Redis from 'ioredis';
 
 export class RedisClient {
-  private static instance: Redis;
+  private static instance: Redis | undefined;
 
   static getInstance(): Redis {
     if (!this.instance) {
@@ -23,9 +23,14 @@ export class RedisClient {
     return this.instance;
   }
 
+  static setInstance(instance: Redis): void {
+    this.instance = instance;
+  }
+
   static async quit(): Promise<void> {
     if (this.instance) {
       await this.instance.quit();
+      this.instance = undefined;
     }
   }
 }

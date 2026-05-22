@@ -2,7 +2,6 @@ import { RedisClient } from '../redis/client';
 
 export interface RateLimitConfig {
   requestsPerMinute: number;
-  burstLimit: number;
 }
 
 export class RateLimiter {

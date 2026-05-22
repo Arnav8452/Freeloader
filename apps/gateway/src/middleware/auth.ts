@@ -42,7 +42,6 @@ export async function authMiddleware(request: FastifyRequest, reply: FastifyRepl
   try {
     const config = {
       requestsPerMinute: parseInt(process.env.RATE_LIMIT_RPM || '60', 10),
-      burstLimit: parseInt(process.env.RATE_LIMIT_BURST || '100', 10),
     };
 
     const limitCheck = await rateLimiter.checkLimit(hashedKey, config);
