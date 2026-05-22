@@ -101,7 +101,7 @@ Docker is required to run the local Redis instance for state management. Downloa
 1. **Google AI Studio (Gemini)**: Go to [Google AI Studio API Keys](https://aistudio.google.com/app/apikey).
 2. **Groq**: Go to the [Groq Console](https://console.groq.com/keys).
 3. **Cerebras**: Go to [Cerebras Cloud](https://cloud.cerebras.ai/).
-4. **OpenRouter**: Go to [OpenRouter Keys](https://openrouter.ai/keys). Create a key with a tiny limit (e.g. `$1`) to access free models.
+4. **OpenRouter**: Go to [OpenRouter Keys](https://openrouter.ai/keys).
 5. **(Optional) Local Fallback (Ollama)**: Install [Ollama](https://ollama.com/) and run `ollama serve`.
 
 ### Installation & Run
