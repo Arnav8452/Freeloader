@@ -177,6 +177,13 @@ docker compose up -d
 npm --prefix apps/gateway run start
 ```
 
+**6. Start the Live Dashboard**
+To visualize your routing metrics and cost savings in real-time:
+```bash
+pnpm --filter dashboard dev
+```
+Then open `http://localhost:3000` in your browser!
+
 ---
 
 ## Architecture & Features
