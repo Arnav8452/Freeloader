@@ -1,0 +1,133 @@
+import { GatewayRequest, GatewayResponse, GatewayStreamChunk, IProvider } from '../types';
+import { RequestClassifier } from './classifier';
+import { RoutingEngine, RoutingStrategy } from '../routing/engine';
+import { ModelRegistry } from '../model-registry';
+
+export class PipelineOrchestrator {
+  private routingEngine: RoutingEngine;
+
+  constructor(
+    private registeredProviders: IProvider[],
+    userWeighting: Record<string, number> = {}
+  ) {
+    this.routingEngine = new RoutingEngine(userWeighting);
+  }
+
+  /**
+   * Executes a standard chat completion request with failover support.
+   */
+  async execute(request: GatewayRequest, signal?: AbortSignal): Promise<GatewayResponse> {
+    const classification = RequestClassifier.classify(request);
+    
+    // 1. Filter providers by required capabilities
+    const eligibleProviders = this.registeredProviders.filter(p => 
+      RequestClassifier.providerMeetsRequirements(classification, p.capabilities)
+    );
+
+    if (eligibleProviders.length === 0) {
+      throw new Error('No registered providers meet the requirements for this request (e.g., maxContext, jsonMode).');
+    }
+
+    // 2. Score providers dynamically
+    const strategy = classification.requiresJsonMode ? RoutingStrategy.JSON_RELIABLE 
+                   : classification.isHeavyTask ? RoutingStrategy.LARGE_CONTEXT 
+                   : RoutingStrategy.FASTEST;
+
+    const scoredProviders = await this.routingEngine.scoreProviders(eligibleProviders, strategy);
+
+    if (scoredProviders.length === 0) {
+      throw new Error('All eligible providers are currently unhealthy or out of quota.');
+    }
+
+    // 3. Cascade execution
+    let lastError: any = null;
+
+    for (const { provider } of scoredProviders) {
+      // Abort early if the client disconnected
+      if (signal?.aborted) throw new Error('Request aborted by client');
+
+      try {
+        // Model Virtualization: Translate requested model to provider-specific model
+        const actualModel = request.model ? ModelRegistry.resolveForProvider(request.model, provider.name) : undefined;
+        
+        // Clone the request and inject the translated model
+        const providerRequest = { ...request, model: actualModel };
+
+        // Attempt the execution
+        const response = await provider.chatCompletion(providerRequest, signal);
+        
+        // Successfully executed, return immediately
+        return response;
+      } catch (err: any) {
+        lastError = err;
+        // Log failure for this provider and continue to the next one in the cascade
+        console.warn(`[Freeloader] Provider ${provider.name} failed:`, err.message);
+        // Note: In a full implementation, we'd also trigger the Circuit Breaker to record this failure
+      }
+    }
+
+    // If we exhaust the cascade, throw the last encountered error
+    throw new Error(`All providers failed. Last error: ${lastError?.message}`);
+  }
+
+  /**
+   * Executes a streaming chat completion request with failover support.
+   * Note: Failover is only possible BEFORE the first chunk is emitted.
+   */
+  async *executeStream(request: GatewayRequest, signal?: AbortSignal): AsyncGenerator<GatewayStreamChunk> {
+    const classification = RequestClassifier.classify(request);
+    classification.requiresStreaming = true; // Ensure this is forced
+
+    const eligibleProviders = this.registeredProviders.filter(p => 
+      RequestClassifier.providerMeetsRequirements(classification, p.capabilities)
+    );
+
+    if (eligibleProviders.length === 0) {
+      throw new Error('No registered providers support streaming for this request.');
+    }
+
+    const strategy = classification.isHeavyTask ? RoutingStrategy.LARGE_CONTEXT : RoutingStrategy.FASTEST;
+    const scoredProviders = await this.routingEngine.scoreProviders(eligibleProviders, strategy);
+
+    if (scoredProviders.length === 0) {
+      throw new Error('All eligible providers are currently unhealthy or out of quota.');
+    }
+
+    let lastError: any = null;
+
+    for (const { provider } of scoredProviders) {
+      if (signal?.aborted) throw new Error('Request aborted by client');
+
+      const actualModel = request.model ? ModelRegistry.resolveForProvider(request.model, provider.name) : undefined;
+      const providerRequest = { ...request, model: actualModel };
+
+      let streamGeneratedBytes = false;
+      
+      try {
+        const stream = provider.chatCompletionStream(providerRequest, signal);
+
+        for await (const chunk of stream) {
+          streamGeneratedBytes = true; // Once we yield, we CANNOT retry
+          yield chunk;
+        }
+
+        // Stream completed successfully
+        return;
+
+      } catch (err: any) {
+        lastError = err;
+        console.warn(`[Freeloader] Provider ${provider.name} stream failed:`, err.message);
+        
+        if (streamGeneratedBytes) {
+          // If we already started sending bytes to the client, we cannot failover to another provider.
+          // We must bubble up the error to terminate the stream safely.
+          throw new Error(`[Freeloader] Stream interrupted mid-flight from ${provider.name}: ${err.message}`);
+        }
+        
+        // If we haven't yielded any bytes yet, it's safe to continue the loop and failover.
+      }
+    }
+
+    throw new Error(`All providers failed to start streaming. Last error: ${lastError?.message}`);
+  }
+}
