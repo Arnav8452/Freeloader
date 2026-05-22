@@ -1,4 +1,4 @@
-import { IProvider, ProviderCapability, GatewayRequest, GatewayResponse, GatewayStreamChunk } from '@freeloader/core';
+import { IProvider, ProviderCapability, GatewayRequest, GatewayResponse, GatewayStreamChunk, Message } from '@freeloader/core';
 import { BaseAdapter, ProviderError } from '../base';
 
 export class GeminiAdapter extends BaseAdapter {
@@ -32,7 +32,7 @@ export class GeminiAdapter extends BaseAdapter {
 
   private transformRequest(request: GatewayRequest): any {
     // Convert OpenAI message format to Gemini format
-    const contents = request.messages.map(msg => ({
+    const contents = request.messages.map((msg: Message) => ({
       role: msg.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: msg.content }]
     }));
