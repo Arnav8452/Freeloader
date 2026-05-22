@@ -4,8 +4,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc",
-    "dev": "tsc --watch",
+    "build": "tsc -b",
+    "test": "echo \"No tests yet\"",
     "lint": "eslint src/"
   },
   "dependencies": {
