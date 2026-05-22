@@ -27,6 +27,9 @@ jobs:
     - name: Install dependencies
       run: pnpm install
       
+    - name: Build Core
+      run: pnpm --filter @freeloader/core build
+
     - name: Build Turbo
       run: pnpm build --force
 
