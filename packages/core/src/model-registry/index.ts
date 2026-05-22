@@ -7,7 +7,7 @@ const modelMappings: VirtualModelMapping[] = [
   {
     requestedModel: 'gpt-4o',
     providerModelMap: {
-      gemini: 'gemini-1.5-flash-latest',
+      gemini: 'gemini-2.5-flash',
       groq: 'llama-3.1-8b-instant',
       cerebras: 'llama3.1-8b',
       openrouter: 'openrouter/auto',
@@ -16,7 +16,7 @@ const modelMappings: VirtualModelMapping[] = [
   {
     requestedModel: 'gpt-4o-mini',
     providerModelMap: {
-      gemini: 'gemini-1.5-flash-latest',
+      gemini: 'gemini-2.5-flash',
       groq: 'llama-3.1-8b-instant',
       cerebras: 'llama3.1-8b',
       openrouter: 'meta-llama/llama-3-8b-instruct:free',
@@ -25,7 +25,7 @@ const modelMappings: VirtualModelMapping[] = [
   {
     requestedModel: 'gpt-3.5-turbo',
     providerModelMap: {
-      gemini: 'gemini-1.5-flash-latest',
+      gemini: 'gemini-2.5-flash',
       groq: 'llama-3.1-8b-instant',
       cerebras: 'llama3.1-8b',
       openrouter: 'openrouter/auto',
@@ -34,7 +34,7 @@ const modelMappings: VirtualModelMapping[] = [
   {
     requestedModel: 'claude-3-5-sonnet',
     providerModelMap: {
-      gemini: 'gemini-1.5-flash-latest',
+      gemini: 'gemini-2.5-flash',
       groq: 'llama-3.1-8b-instant',
       cerebras: 'llama3.1-8b',
       openrouter: 'anthropic/claude-3.5-sonnet:beta',
