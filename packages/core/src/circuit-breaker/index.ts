@@ -123,4 +123,27 @@ export class CircuitBreaker {
       await this.redis.pexpire(this.getFailureKey(), this.config.recoveryTimeoutMs);
     }
   }
+
+  /**
+   * Returns a summary of all active (OPEN or HALF_OPEN) circuit breakers across the gateway.
+   */
+  static async getActiveBreakers(): Promise<{ provider: string, state: CircuitBreakerState }[]> {
+    const redis = RedisClient.getInstance();
+    const keys = await redis.keys('cb:*:state');
+    
+    if (keys.length === 0) return [];
+    
+    const states = await redis.mget(...keys);
+    const activeBreakers: { provider: string, state: CircuitBreakerState }[] = [];
+    
+    for (let i = 0; i < keys.length; i++) {
+      const state = states[i] as CircuitBreakerState | null;
+      if (state && (state === CircuitBreakerState.OPEN || state === CircuitBreakerState.HALF_OPEN)) {
+        const providerName = keys[i].split(':')[1];
+        activeBreakers.push({ provider: providerName, state });
+      }
+    }
+    
+    return activeBreakers;
+  }
 }

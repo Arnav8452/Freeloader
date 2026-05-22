@@ -3,6 +3,8 @@ import { RequestClassifier } from './classifier';
 import { RoutingEngine, RoutingStrategy } from '../routing/engine';
 import { ModelRegistry } from '../model-registry';
 import { CircuitBreaker } from '../circuit-breaker';
+import { MetricsLogger } from '../metrics/logger';
+import crypto from 'crypto';
 
 export class PipelineOrchestrator {
   private routingEngine: RoutingEngine;
@@ -42,6 +44,8 @@ export class PipelineOrchestrator {
 
     // 3. Cascade execution
     let lastError: any = null;
+    const requestId = crypto.randomUUID();
+    const startTime = performance.now();
 
     for (const { provider } of scoredProviders) {
       // Abort early if the client disconnected
@@ -69,10 +73,35 @@ export class PipelineOrchestrator {
         
         await breaker.recordSuccess();
 
+        const latencyMs = Math.round(performance.now() - startTime);
+        const promptTokens = response.usage?.prompt_tokens || 0;
+        const completionTokens = response.usage?.completion_tokens || 0;
+        const totalTokens = response.usage?.total_tokens || (promptTokens + completionTokens);
+
+        await MetricsLogger.logEvent({
+          id: requestId,
+          provider: provider.name,
+          status: 'success',
+          latencyMs,
+          tokens: totalTokens,
+          timestamp: new Date().toISOString()
+        }, promptTokens, completionTokens);
+
         // Successfully executed, return immediately
         return response;
       } catch (err: any) {
         lastError = err;
+        const latencyMs = Math.round(performance.now() - startTime);
+        
+        await MetricsLogger.logEvent({
+          id: requestId,
+          provider: provider.name,
+          status: 'failure',
+          latencyMs,
+          tokens: 0,
+          timestamp: new Date().toISOString()
+        });
+
         // Log failure for this provider and continue to the next one in the cascade
         console.warn(`[Freeloader] Provider ${provider.name} failed:`, err.message);
         await breaker.recordFailure();
@@ -107,6 +136,8 @@ export class PipelineOrchestrator {
     }
 
     let lastError: any = null;
+    const requestId = crypto.randomUUID();
+    const startTime = performance.now();
 
     for (const { provider } of scoredProviders) {
       if (signal?.aborted) throw new Error('Request aborted by client');
@@ -128,14 +159,33 @@ export class PipelineOrchestrator {
       try {
         const stream = provider.chatCompletionStream(providerRequest, signal);
 
+        let promptTokens = 0;
+        let completionTokens = 0;
+
         for await (const chunk of stream) {
           if (!streamGeneratedBytes) {
              streamGeneratedBytes = true; // Once we yield, we CANNOT retry
              // We consider the first successful byte as a success for the breaker
              await breaker.recordSuccess();
           }
+          if (chunk.usage) {
+            promptTokens = chunk.usage.prompt_tokens || 0;
+            completionTokens = chunk.usage.completion_tokens || 0;
+          }
           yield chunk;
         }
+
+        const latencyMs = Math.round(performance.now() - startTime);
+        const totalTokens = promptTokens + completionTokens;
+
+        await MetricsLogger.logEvent({
+          id: requestId,
+          provider: provider.name,
+          status: 'success',
+          latencyMs,
+          tokens: totalTokens,
+          timestamp: new Date().toISOString()
+        }, promptTokens, completionTokens);
 
         // Stream completed successfully
         return;
@@ -144,12 +194,23 @@ export class PipelineOrchestrator {
         lastError = err;
         console.warn(`[Freeloader] Provider ${provider.name} stream failed:`, err.message);
         
+        const latencyMs = Math.round(performance.now() - startTime);
+        
         if (streamGeneratedBytes) {
           // If we already started sending bytes to the client, we cannot failover to another provider.
           // We must bubble up the error to terminate the stream safely.
           throw new Error(`[Freeloader] Stream interrupted mid-flight from ${provider.name}: ${err.message}`);
         }
         
+        await MetricsLogger.logEvent({
+          id: requestId,
+          provider: provider.name,
+          status: 'failure',
+          latencyMs,
+          tokens: 0,
+          timestamp: new Date().toISOString()
+        });
+
         // If we haven't yielded any bytes yet, it's safe to record failure, continue the loop and failover.
         await breaker.recordFailure();
       }
