@@ -3,11 +3,11 @@ import assert from 'node:assert';
 import fastify, { FastifyInstance } from 'fastify';
 
 import RedisMock from 'ioredis-mock';
-import { RedisClient } from '@freeloader/core/dist/redis/client.js';
+import { RedisClient } from '@freeloader/core';
 
 // Ensure the mock is set up before we import the middleware
 const mockRedis = new RedisMock();
-// @ts-ignore
+// @ts-expect-error
 RedisClient.getInstance = () => mockRedis;
 
 describe('Gateway Routes', () => {
