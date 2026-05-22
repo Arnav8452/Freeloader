@@ -107,7 +107,13 @@ const stream = await pipeline.createChatCompletion({
 ```
 
 ### 3. One-Click Cloud Deployment
-Because the dashboard and gateway are built on Next.js and Fastify, you can securely host Freeloader entirely in the cloud. We are actively working on **One-Click Deploy buttons for Vercel, Render, and Railway** so you can spin up your own private inference router instantly.
+Because the dashboard and gateway are built on standard Docker containers, you can securely host Freeloader entirely in the cloud with zero maintenance.
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Arnav8452/Freeloader)
+
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/template/custom?repo=https://github.com/Arnav8452/Freeloader)
+
+Clicking these buttons will automatically provision the Redis instance, build the Docker container, and prompt you to securely enter your API keys during setup.
 
 ---
 

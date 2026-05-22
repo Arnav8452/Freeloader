@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: freeloader-gateway
+    env: docker
+    dockerfilePath: Dockerfile
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: freeloader-redis
+          property: connectionString
+      - key: GOOGLE_API_KEY
+        sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: CEREBRAS_API_KEY
+        sync: false
+      - key: OPENROUTER_API_KEY
+        sync: false
+
+  - type: redis
+    name: freeloader-redis
+    plan: free
+    maxMemory: 256
