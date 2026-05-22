@@ -28,7 +28,7 @@ jobs:
       run: pnpm install
       
     - name: Build Turbo
-      run: pnpm build
+      run: pnpm build --force
 
     - name: Lint
       run: pnpm lint
