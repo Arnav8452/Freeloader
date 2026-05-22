@@ -70,9 +70,23 @@ npm install @freeloader/core @freeloader/adapters
 
 ```typescript
 import { FreeloaderPipeline } from '@freeloader/core';
-import { GeminiAdapter, GroqAdapter } from '@freeloader/adapters';
+import { GeminiAdapter, GroqAdapter, CerebrasAdapter, OpenRouterAdapter } from '@freeloader/adapters';
 
 // Instantiate the pipeline natively inside your own server!
+const pipeline = new FreeloaderPipeline({
+  providers: [
+    new GeminiAdapter({ apiKey: process.env.GOOGLE_API_KEY }),
+    new CerebrasAdapter({ apiKey: process.env.CEREBRAS_API_KEY }),
+    new GroqAdapter({ apiKey: process.env.GROQ_API_KEY }),
+    new OpenRouterAdapter({ apiKey: process.env.OPENROUTER_API_KEY })
+  ]
+});
+
+// Use it directly in your Next.js API routes or Fastify handlers
+const stream = await pipeline.createChatCompletion({
+  model: "gpt-4o-mini",
+  messages: [{ role: "user", content: "Hello!" }]
+});
 ```
 
 ### 3. One-Click Cloud Deployment
