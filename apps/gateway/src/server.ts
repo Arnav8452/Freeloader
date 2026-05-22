@@ -14,7 +14,7 @@ server.register(cors, {
 // Register Auth Middleware globally
 server.addHook('preHandler', async (request, reply) => {
   // Exclude health and metrics endpoints from auth
-  if (request.url.startsWith('/health') || request.url.startsWith('/v1/metrics')) return;
+  if (request.url.startsWith('/health') || request.url.startsWith('/stats')) return;
   await authMiddleware(request, reply);
 });
 

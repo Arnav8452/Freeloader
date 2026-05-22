@@ -27,7 +27,8 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchMetrics = async () => {
       try {
-        const res = await fetch("http://localhost:3000/v1/metrics");
+        const host = window.location.hostname;
+        const res = await fetch(`http://${host}:3000/stats`);
         if (res.ok) {
           const data = await res.json();
           setMetrics(data);

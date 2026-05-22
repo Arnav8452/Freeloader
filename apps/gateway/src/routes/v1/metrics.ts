@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyPluginAsync } from 'fastify';
 import { MetricsLogger, CircuitBreaker } from '@freeloaderapi/core';
 
 export const metricsRoutes: FastifyPluginAsync = async (server: FastifyInstance) => {
-  server.get('/v1/metrics', async (request, reply) => {
+  server.get('/stats', async (request, reply) => {
     try {
       const stats = await MetricsLogger.getDashboardMetrics();
       const circuitBreakers = await CircuitBreaker.getActiveBreakers();
