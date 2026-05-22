@@ -44,19 +44,36 @@ Freeloader then:
 
 Freeloader is designed as a highly modular monorepo, meaning you can integrate it into your own setup in **three different ways** depending on your architecture:
 
-### 1. As a Drop-In Gateway (Easiest)
-Spin up the Freeloader Gateway, and change **one line of code** in your existing AI app (using LangChain, Vercel AI SDK, or the OpenAI SDK):
+### 1. As a Drop-In Gateway (Easiest & Most Secure)
+Spin up the Freeloader Gateway using Docker. This approach is highly recommended because it **completely centralizes your API keys**. Your main application never needs to know your Google or Groq credentials—it only talks to your local Docker container.
+
+First, create a `.env` file with your free-tier keys:
+```env
+GOOGLE_API_KEY=your_gemini_key
+GROQ_API_KEY=your_groq_key
+CEREBRAS_API_KEY=your_cerebras_key
+OPENROUTER_API_KEY=your_openrouter_key
+```
+
+Start the gateway:
+```bash
+docker compose -f docker-compose.prod.yml up -d
+```
+
+Then, change **one line of code** in your existing AI app (using LangChain, Vercel AI SDK, or the OpenAI SDK) to point to your new local gateway:
 
 ```typescript
 import OpenAI from "openai";
 
 const client = new OpenAI({
-  apiKey: "freeloader-local", // Handled by your gateway auth
-  baseURL: "http://localhost:3000/v1", // <-- Point this to your Freeloader gateway!
+  // Point this to your Freeloader Docker container!
+  baseURL: "http://localhost:3000/v1", 
+  // Any placeholder works; Freeloader uses the real keys from the .env file securely on the server
+  apiKey: "freeloader-local", 
 });
 
 const response = await client.chat.completions.create({
-  model: "gpt-4o-mini", // Freeloader virtualizes this automatically
+  model: "gpt-4o-mini", // Freeloader virtualizes this automatically to a free model
   messages: [{ role: "user", content: "Hello!" }],
 });
 ```
