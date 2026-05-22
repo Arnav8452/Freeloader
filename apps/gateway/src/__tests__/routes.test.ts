@@ -7,7 +7,6 @@ import { RedisClient } from '@freeloader/core';
 
 // Ensure the mock is set up before we import the middleware
 const mockRedis = new RedisMock();
-// @ts-expect-error
 RedisClient.getInstance = () => mockRedis;
 
 describe('Gateway Routes', () => {
