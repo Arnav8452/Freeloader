@@ -21,7 +21,6 @@ As a student and indie developer, it is difficult to afford large-scale API bill
 | **Ollama** | Local fallback (Unlimited) |
 
 **Combined estimated free capacity:**
-
 - ~3M-10M+ tokens/day
 - ~90M-300M+ tokens/month
 
@@ -32,7 +31,6 @@ As a student and indie developer, it is difficult to afford large-scale API bill
 Freeloader acts as a unified AI gateway. Instead of your app talking directly to OpenAI, Gemini, Groq, Cerebras, or OpenRouter, it talks to Freeloader.
 
 Freeloader then:
-
 1. Selects the best provider based on health and quota.
 2. Retries failed requests automatically.
 3. Falls back to the next provider seamlessly.
@@ -40,101 +38,88 @@ Freeloader then:
 5. Streams responses using production-grade SSE.
 6. Optimizes your free-tier usage.
 
-### Drop-In Compatibility
+---
 
-Freeloader is strictly OpenAI-compatible. Existing tools work with almost no code changes, including:
+## Integration Methods
 
-- OpenAI SDK
-- LangChain
-- Vercel AI SDK
-- LiteLLM
-- Custom AI apps & Agents
+Freeloader is designed as a highly modular monorepo, meaning you can integrate it into your own setup in **three different ways** depending on your architecture:
 
-Just change your `OPENAI_BASE_URL` and `OPENAI_API_KEY`.
+### 1. As a Drop-In Gateway (Easiest)
+Spin up the Freeloader Gateway, and change **one line of code** in your existing AI app (using LangChain, Vercel AI SDK, or the OpenAI SDK):
+
+```typescript
+import OpenAI from "openai";
+
+const client = new OpenAI({
+  apiKey: "freeloader-local", // Handled by your gateway auth
+  baseURL: "http://localhost:3000/v1", // <-- Point this to your Freeloader gateway!
+});
+
+const response = await client.chat.completions.create({
+  model: "gpt-4o-mini", // Freeloader virtualizes this automatically
+  messages: [{ role: "user", content: "Hello!" }],
+});
+```
+
+### 2. As an NPM Library (For Custom Node.js Backends)
+Because the core routing logic is decoupled from the Fastify server, you can install the packages directly into your own Next.js or Node.js backend. You can build your own custom gateways using our resilience logic!
+
+```bash
+npm install @freeloader/core @freeloader/adapters
+```
+
+```typescript
+import { FreeloaderPipeline } from '@freeloader/core';
+import { GeminiAdapter, GroqAdapter } from '@freeloader/adapters';
+
+// Instantiate the pipeline natively inside your own server!
+```
+
+### 3. One-Click Cloud Deployment
+Because the dashboard and gateway are built on Next.js and Fastify, you can securely host Freeloader entirely in the cloud. We are actively working on **One-Click Deploy buttons for Vercel, Render, and Railway** so you can spin up your own private inference router instantly.
 
 ---
 
-## Setup Guide
+## Setup Guide (Local Gateway)
 
 ### Prerequisites
 
 **1. Install Node.js**
-
 Download the LTS version from the [Node.js Official Site](https://nodejs.org/).
 
-```bash
-node -v
-npm -v
-```
-
 **2. Install pnpm**
-
 We use pnpm for faster, disk-efficient dependency management. See the [pnpm installation docs](https://pnpm.io/installation).
-
 ```bash
 npm install -g pnpm
-pnpm -v
 ```
 
 **3. Install Docker Desktop**
-
 Docker is required to run the local Redis instance for state management. Download it from [Docker Desktop](https://www.docker.com/products/docker-desktop/).
-
-```bash
-docker -v
-```
 
 ### Get Your Free API Keys
 
-**1. Google AI Studio (Gemini)**
-
-- Go to [Google AI Studio API Keys](https://aistudio.google.com/app/apikey).
-- Sign in, click **Create API Key**, and select "Create API key in new project".
-
-**2. Groq**
-
-- Go to the [Groq Console](https://console.groq.com/keys).
-- Create an account and generate a key.
-
-**3. Cerebras**
-
-- Go to [Cerebras Cloud](https://cloud.cerebras.ai/).
-- Create an account and generate an inference API key.
-
-**4. OpenRouter**
-
-- Go to [OpenRouter Keys](https://openrouter.ai/keys).
-- Create a key. Leave the credit limit blank or set a tiny limit like `$1`.
-
-**5. Optional Local Fallback (Ollama)**
-
-- Install from the [Ollama Official Site](https://ollama.com/).
-- Pull and run a local model:
-
-```bash
-ollama pull qwen2.5:3b
-ollama serve
-```
+1. **Google AI Studio (Gemini)**: Go to [Google AI Studio API Keys](https://aistudio.google.com/app/apikey).
+2. **Groq**: Go to the [Groq Console](https://console.groq.com/keys).
+3. **Cerebras**: Go to [Cerebras Cloud](https://cloud.cerebras.ai/).
+4. **OpenRouter**: Go to [OpenRouter Keys](https://openrouter.ai/keys). Create a key with a tiny limit (e.g. `$1`) to access free models.
+5. **(Optional) Local Fallback (Ollama)**: Install [Ollama](https://ollama.com/) and run `ollama serve`.
 
 ### Installation & Run
 
 **1. Clone the repository**
-
 ```bash
 git clone YOUR_REPO_URL
 cd freeloader
 ```
 
-**2. Install dependencies**
-
+**2. Install dependencies & Build**
 ```bash
 pnpm install
+pnpm build
 ```
 
 **3. Configure Environment Variables**
-
-Create a `.env` file in the root directory:
-
+Create a `.env` file in the `apps/gateway` directory:
 ```env
 GOOGLE_API_KEY=your_key_here
 GROQ_API_KEY=your_key_here
@@ -146,37 +131,13 @@ REDIS_URL=redis://localhost:6379
 ```
 
 **4. Start Redis**
-
 ```bash
 docker compose up -d
 ```
 
 **5. Start Freeloader Gateway**
-
 ```bash
-pnpm dev
-```
-
----
-
-## Usage
-
-Point your existing OpenAI SDK to Freeloader:
-
-```typescript
-import OpenAI from "openai";
-
-const client = new OpenAI({
-  apiKey: "freeloader-local", // Handled by your gateway auth
-  baseURL: "http://localhost:3000/v1",
-});
-
-const response = await client.chat.completions.create({
-  model: "gpt-4o-mini", // Freeloader virtualizes this automatically
-  messages: [{ role: "user", content: "Hello!" }],
-});
-
-console.log(response);
+npm --prefix apps/gateway run start
 ```
 
 ---
