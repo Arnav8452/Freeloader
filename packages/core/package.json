@@ -1,5 +1,5 @@
 {
-  "name": "@freeloader/core",
+  "name": "@freeloaderapi/core",
   "version": "0.1.0",
   "description": "Core resilience, caching, and routing logic for the Freeloader AI Gateway.",
   "author": "Arnav",

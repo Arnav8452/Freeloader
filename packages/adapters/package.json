@@ -1,5 +1,5 @@
 {
-  "name": "@freeloader/adapters",
+  "name": "@freeloaderapi/adapters",
   "version": "0.1.0",
   "description": "Provider adapters (Gemini, Groq, Cerebras, etc.) for the Freeloader AI Gateway.",
   "author": "Arnav",
@@ -23,7 +23,7 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@freeloader/core": "workspace:*"
+    "@freeloaderapi/core": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.4.0"

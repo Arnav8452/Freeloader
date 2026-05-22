@@ -3,7 +3,7 @@ import assert from 'node:assert';
 import fastify, { FastifyInstance } from 'fastify';
 
 import RedisMock from 'ioredis-mock';
-import { RedisClient } from '@freeloader/core';
+import { RedisClient } from '@freeloaderapi/core';
 
 // Ensure the mock is set up before we import the middleware
 const mockRedis = new RedisMock();

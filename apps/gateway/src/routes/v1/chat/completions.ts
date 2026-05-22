@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
-import { PipelineOrchestrator, GatewayRequest } from '@freeloader/core';
-import { GeminiAdapter, GroqAdapter, OpenRouterAdapter, OllamaAdapter, CerebrasAdapter } from '@freeloader/adapters';
+import { PipelineOrchestrator, GatewayRequest } from '@freeloaderapi/core';
+import { GeminiAdapter, GroqAdapter, OpenRouterAdapter, OllamaAdapter, CerebrasAdapter } from '@freeloaderapi/adapters';
 
 const providers = [
   new GeminiAdapter(),

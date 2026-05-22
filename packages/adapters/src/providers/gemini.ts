@@ -1,4 +1,4 @@
-import { IProvider, ProviderCapability, GatewayRequest, GatewayResponse, GatewayStreamChunk, Message } from '@freeloader/core';
+import { IProvider, ProviderCapability, GatewayRequest, GatewayResponse, GatewayStreamChunk, Message } from '@freeloaderapi/core';
 import { BaseAdapter, ProviderError } from '../base';
 
 export class GeminiAdapter extends BaseAdapter {

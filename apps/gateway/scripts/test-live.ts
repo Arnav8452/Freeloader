@@ -1,5 +1,5 @@
-import { PipelineOrchestrator, GatewayRequest } from '@freeloader/core';
-import { GeminiAdapter, GroqAdapter } from '@freeloader/adapters';
+import { PipelineOrchestrator, GatewayRequest } from '@freeloaderapi/core';
+import { GeminiAdapter, GroqAdapter } from '@freeloaderapi/adapters';
 import dotenv from 'dotenv';
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 dotenv.config({ path: '../../.env' });

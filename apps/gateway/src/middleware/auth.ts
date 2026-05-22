@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { RateLimiter } from '@freeloader/core';
+import { RateLimiter } from '@freeloaderapi/core';
 import crypto from 'crypto';
 
 const rateLimiter = new RateLimiter();

@@ -10,10 +10,10 @@ COPY . .
 
 # Install dependencies and build all required packages
 RUN pnpm install --frozen-lockfile
-RUN pnpm build --filter=@freeloader/gateway...
+RUN pnpm build --filter=@freeloaderapi/gateway...
 
 # Deploy the gateway package (extracts only what is needed for production)
-RUN pnpm --filter=@freeloader/gateway deploy /prod/gateway --prod
+RUN pnpm --filter=@freeloaderapi/gateway deploy /prod/gateway --prod
 
 # --- Runner Stage ---
 FROM node:20-alpine AS runner

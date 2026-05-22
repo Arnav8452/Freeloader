@@ -1,4 +1,4 @@
-# @freeloader/core
+# @freeloaderapi/core
 
 **Core routing and resilience logic for the Freeloader AI Gateway.**
 
@@ -11,7 +11,7 @@ This package contains the essential components for building highly available, mu
 ## Installation
 
 ```bash
-npm install @freeloader/core
+npm install @freeloaderapi/core
 ```
 
 ## Usage

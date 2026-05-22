@@ -1,4 +1,4 @@
-import { IProvider, ProviderCapability, GatewayRequest, GatewayResponse, GatewayStreamChunk } from '@freeloader/core';
+import { IProvider, ProviderCapability, GatewayRequest, GatewayResponse, GatewayStreamChunk } from '@freeloaderapi/core';
 
 export class ProviderError extends Error {
   constructor(

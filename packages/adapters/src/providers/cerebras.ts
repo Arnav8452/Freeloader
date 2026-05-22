@@ -1,4 +1,4 @@
-import { IProvider, ProviderCapability, GatewayRequest, GatewayResponse, GatewayStreamChunk } from '@freeloader/core';
+import { IProvider, ProviderCapability, GatewayRequest, GatewayResponse, GatewayStreamChunk } from '@freeloaderapi/core';
 import { BaseAdapter, ProviderError } from '../base';
 
 export class CerebrasAdapter extends BaseAdapter {

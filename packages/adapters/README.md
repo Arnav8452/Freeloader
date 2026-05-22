@@ -1,4 +1,4 @@
-# @freeloader/adapters
+# @freeloaderapi/adapters
 
 **Provider adapters for the Freeloader AI Gateway.**
 
@@ -12,11 +12,11 @@ This package contains strict OpenAI-compatible translation layers for various fr
 ## Installation
 
 ```bash
-npm install @freeloader/adapters
+npm install @freeloaderapi/adapters
 ```
 
 ## Usage
 
-*This library is designed to be used internally by the Freeloader Gateway, but can be imported into custom applications alongside `@freeloader/core`.*
+*This library is designed to be used internally by the Freeloader Gateway, but can be imported into custom applications alongside `@freeloaderapi/core`.*
 
 See the main [Freeloader Repository](https://github.com/Arnav8452/Freeloader) for full documentation.

@@ -14,7 +14,7 @@
     "isolatedModules": true,
     "baseUrl": ".",
     "paths": {
-      "@freeloader/*": ["packages/*/dist"]
+      "@freeloaderapi/*": ["packages/*/dist"]
     }
   }
 }

@@ -82,12 +82,12 @@ const response = await client.chat.completions.create({
 Because the core routing logic is decoupled from the Fastify server, you can install the packages directly into your own Next.js or Node.js backend. You can build your own custom gateways using our resilience logic!
 
 ```bash
-npm install @freeloader/core @freeloader/adapters
+npm install @freeloaderapi/core @freeloaderapi/adapters
 ```
 
 ```typescript
-import { FreeloaderPipeline } from '@freeloader/core';
-import { GeminiAdapter, GroqAdapter, CerebrasAdapter, OpenRouterAdapter } from '@freeloader/adapters';
+import { FreeloaderPipeline } from '@freeloaderapi/core';
+import { GeminiAdapter, GroqAdapter, CerebrasAdapter, OpenRouterAdapter } from '@freeloaderapi/adapters';
 
 // Instantiate the pipeline natively inside your own server!
 const pipeline = new FreeloaderPipeline({

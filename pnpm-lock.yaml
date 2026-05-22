@@ -87,10 +87,10 @@ importers:
 
   apps/gateway:
     dependencies:
-      '@freeloader/adapters':
+      '@freeloaderapi/adapters':
         specifier: workspace:*
         version: link:../../packages/adapters
-      '@freeloader/core':
+      '@freeloaderapi/core':
         specifier: workspace:*
         version: link:../../packages/core
       fastify:
@@ -112,7 +112,7 @@ importers:
 
   packages/adapters:
     dependencies:
-      '@freeloader/core':
+      '@freeloaderapi/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
