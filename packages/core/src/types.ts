@@ -7,6 +7,7 @@ export interface Message {
 export interface GatewayRequest {
   messages: Message[];
   model?: string;
+  provider?: string; // Optional override to force a specific provider
   temperature?: number;
   max_tokens?: number;
   stream?: boolean;

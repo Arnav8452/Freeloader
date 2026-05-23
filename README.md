@@ -1,4 +1,4 @@
-# Freeloader - The forever free AI usage for devs
+# Freeloader
 
 **An OpenAI-compatible AI inference gateway optimized for cost efficiency.**
 
@@ -165,6 +165,7 @@ OPENROUTER_API_KEY=your_key_here
 
 OLLAMA_BASE_URL=http://localhost:11434
 REDIS_URL=redis://localhost:6379
+FREELOADER_API_KEYS=e4cd5267b2dffeb53ca1dfc0b40e5ecde2e13a0da7ca6b86ceb5853fde420281
 ```
 
 **4. Start Redis**
@@ -236,3 +237,17 @@ Then open `http://localhost:3001` in your browser!
 Freeloader is not just a "free API rotation" script. It is an **AI inference resilience infrastructure optimized for cost efficiency.**
 
 It is built for students, indie hackers, OSS projects, AI startups, creator intelligence platforms, and anyone who needs reliable AI infrastructure without the enterprise price tag.
+
+---
+
+## Performance Metrics
+
+| Metric | Result |
+|---|---|
+| **Total Requests** | 20 |
+| **Concurrency** | 20 parallel |
+| **Success Rate** | 100% |
+| **Average Latency** | 1792ms |
+| **Throughput (Req/sec)** | 9.43 req/s |
+| **Throughput (Tokens/sec)** | 355.33 tok/s |
+| **Provider Failover Used** | Yes (groq, gemini) |

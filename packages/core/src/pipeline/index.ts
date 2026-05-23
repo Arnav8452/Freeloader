@@ -31,12 +31,22 @@ export class PipelineOrchestrator {
       throw new Error('No registered providers meet the requirements for this request (e.g., maxContext, jsonMode).');
     }
 
-    // 2. Score providers dynamically
-    const strategy = classification.requiresJsonMode ? RoutingStrategy.JSON_RELIABLE 
-                   : classification.isHeavyTask ? RoutingStrategy.LARGE_CONTEXT 
-                   : RoutingStrategy.FASTEST;
+    // 2. Score providers dynamically (or force if overridden)
+    let scoredProviders: { provider: IProvider; score: number }[] = [];
+    
+    if (request.provider) {
+      const targetProvider = eligibleProviders.find(p => p.name === request.provider);
+      if (!targetProvider) {
+        throw new Error(`Requested provider '${request.provider}' is either not registered or does not meet the requirements for this request.`);
+      }
+      scoredProviders = [{ provider: targetProvider, score: 100 }];
+    } else {
+      const strategy = classification.requiresJsonMode ? RoutingStrategy.JSON_RELIABLE 
+                     : classification.isHeavyTask ? RoutingStrategy.LARGE_CONTEXT 
+                     : RoutingStrategy.FASTEST;
 
-    const scoredProviders = await this.routingEngine.scoreProviders(eligibleProviders, strategy);
+      scoredProviders = await this.routingEngine.scoreProviders(eligibleProviders, strategy);
+    }
 
     if (scoredProviders.length === 0) {
       throw new Error('All eligible providers are currently unhealthy or out of quota.');
@@ -65,8 +75,9 @@ export class PipelineOrchestrator {
         // Model Virtualization: Translate requested model to provider-specific model
         const actualModel = request.model ? ModelRegistry.resolveForProvider(request.model, provider.name) : undefined;
         
-        // Clone the request and inject the translated model
-        const providerRequest = { ...request, model: actualModel };
+        // Clone the request, inject the translated model, and strip the provider override
+        const { provider: _, ...restReq } = request;
+        const providerRequest = { ...restReq, model: actualModel };
 
         // Attempt the execution
         const response = await provider.chatCompletion(providerRequest, signal);
@@ -128,8 +139,18 @@ export class PipelineOrchestrator {
       throw new Error('No registered providers support streaming for this request.');
     }
 
-    const strategy = classification.isHeavyTask ? RoutingStrategy.LARGE_CONTEXT : RoutingStrategy.FASTEST;
-    const scoredProviders = await this.routingEngine.scoreProviders(eligibleProviders, strategy);
+    let scoredProviders: { provider: IProvider; score: number }[] = [];
+    
+    if (request.provider) {
+      const targetProvider = eligibleProviders.find(p => p.name === request.provider);
+      if (!targetProvider) {
+        throw new Error(`Requested provider '${request.provider}' is either not registered or does not meet the requirements for this request.`);
+      }
+      scoredProviders = [{ provider: targetProvider, score: 100 }];
+    } else {
+      const strategy = classification.isHeavyTask ? RoutingStrategy.LARGE_CONTEXT : RoutingStrategy.FASTEST;
+      scoredProviders = await this.routingEngine.scoreProviders(eligibleProviders, strategy);
+    }
 
     if (scoredProviders.length === 0) {
       throw new Error('All eligible providers are currently unhealthy or out of quota.');
@@ -152,7 +173,8 @@ export class PipelineOrchestrator {
       }
 
       const actualModel = request.model ? ModelRegistry.resolveForProvider(request.model, provider.name) : undefined;
-      const providerRequest = { ...request, model: actualModel };
+      const { provider: _, ...restReq } = request;
+      const providerRequest = { ...restReq, model: actualModel };
 
       let streamGeneratedBytes = false;
       
