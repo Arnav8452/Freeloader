@@ -1,4 +1,4 @@
-# Freeloader
+# Freeloader - The forever free AI usage for devs
 
 **An OpenAI-compatible AI inference gateway optimized for cost efficiency.**
 
