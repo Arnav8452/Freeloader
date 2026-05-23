@@ -32,7 +32,7 @@ export class PipelineOrchestrator {
     }
 
     // 2. Score providers dynamically (or force if overridden)
-    let scoredProviders: { provider: IProvider; score: number }[] = [];
+    let scoredProviders: { provider: IProvider; score: number }[];
     
     if (request.provider) {
       const targetProvider = eligibleProviders.find(p => p.name === request.provider);
@@ -76,7 +76,8 @@ export class PipelineOrchestrator {
         const actualModel = request.model ? ModelRegistry.resolveForProvider(request.model, provider.name) : undefined;
         
         // Clone the request, inject the translated model, and strip the provider override
-        const { provider: _, ...restReq } = request;
+        const restReq = { ...request };
+        delete restReq.provider;
         const providerRequest = { ...restReq, model: actualModel };
 
         // Attempt the execution
@@ -139,7 +140,7 @@ export class PipelineOrchestrator {
       throw new Error('No registered providers support streaming for this request.');
     }
 
-    let scoredProviders: { provider: IProvider; score: number }[] = [];
+    let scoredProviders: { provider: IProvider; score: number }[];
     
     if (request.provider) {
       const targetProvider = eligibleProviders.find(p => p.name === request.provider);
@@ -173,7 +174,8 @@ export class PipelineOrchestrator {
       }
 
       const actualModel = request.model ? ModelRegistry.resolveForProvider(request.model, provider.name) : undefined;
-      const { provider: _, ...restReq } = request;
+      const restReq = { ...request };
+      delete restReq.provider;
       const providerRequest = { ...restReq, model: actualModel };
 
       let streamGeneratedBytes = false;
