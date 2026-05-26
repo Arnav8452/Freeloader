@@ -1,4 +1,4 @@
-import { RedisClient } from '../redis/client';
+import { CacheManager } from '../cache/CacheManager';
 
 export enum CircuitBreakerState {
   CLOSED = 'CLOSED',       // Normal operation, routing requests freely
@@ -12,7 +12,7 @@ export interface CircuitBreakerConfig {
 }
 
 export class CircuitBreaker {
-  private redis = RedisClient.getInstance();
+  private cache = CacheManager.getInstance();
 
   constructor(
     private providerName: string,
@@ -32,7 +32,7 @@ export class CircuitBreaker {
    * Handles transition from OPEN to HALF_OPEN if recovery timeout has passed.
    */
   async getState(): Promise<CircuitBreakerState> {
-    const state = await this.redis.get(this.getStateKey());
+    const state = await this.cache.get(this.getStateKey());
 
     if (!state) {
       return CircuitBreakerState.CLOSED;
@@ -40,10 +40,10 @@ export class CircuitBreaker {
 
     if (state === CircuitBreakerState.OPEN) {
       // Check if we should transition to HALF_OPEN
-      const failuresTTL = await this.redis.pttl(this.getFailureKey());
+      const failuresTTL = await this.cache.pttl(this.getFailureKey());
       if (failuresTTL <= 0) {
         // Recovery timeout passed, transition to HALF_OPEN
-        await this.redis.set(this.getStateKey(), CircuitBreakerState.HALF_OPEN);
+        await this.cache.set(this.getStateKey(), CircuitBreakerState.HALF_OPEN);
         return CircuitBreakerState.HALF_OPEN;
       }
     }
@@ -66,7 +66,7 @@ export class CircuitBreaker {
       // In half-open, we only allow one ticket at a time.
       // We can use a simple atomic flag to ensure only one probe request goes through.
       const probeFlagKey = `cb:${this.providerName}:probe`;
-      const acquired = await this.redis.set(probeFlagKey, '1', 'PX', this.config.recoveryTimeoutMs, 'NX');
+      const acquired = await this.cache.setNX(probeFlagKey, '1', this.config.recoveryTimeoutMs);
       
       if (!acquired) {
          throw new Error(`Circuit breaker is HALF_OPEN for provider: ${this.providerName}, probe request already dispatched.`);
@@ -83,12 +83,12 @@ export class CircuitBreaker {
     
     if (state === CircuitBreakerState.HALF_OPEN) {
       console.log(`[CircuitBreaker] Provider ${this.providerName} recovered. Closing circuit.`);
-      await this.redis.del(this.getStateKey());
-      await this.redis.del(`cb:${this.providerName}:probe`);
+      await this.cache.delete(this.getStateKey());
+      await this.cache.delete(`cb:${this.providerName}:probe`);
     }
 
     // Always clear failures on success
-    await this.redis.del(this.getFailureKey());
+    await this.cache.delete(this.getFailureKey());
   }
 
   /**
@@ -101,26 +101,21 @@ export class CircuitBreaker {
     if (state === CircuitBreakerState.HALF_OPEN) {
       // Probe failed, immediately transition back to OPEN
       console.warn(`[CircuitBreaker] Probe request failed for ${this.providerName}. Re-opening circuit.`);
-      await this.redis.set(this.getStateKey(), CircuitBreakerState.OPEN);
+      await this.cache.set(this.getStateKey(), CircuitBreakerState.OPEN);
       // Restart the recovery timer
-      await this.redis.set(this.getFailureKey(), this.config.failureThreshold.toString(), 'PX', this.config.recoveryTimeoutMs);
-      await this.redis.del(`cb:${this.providerName}:probe`);
+      await this.cache.set(this.getFailureKey(), this.config.failureThreshold.toString(), this.config.recoveryTimeoutMs / 1000);
+      await this.cache.delete(`cb:${this.providerName}:probe`);
       return;
     }
 
     // Normal CLOSED state handling
-    const failures = await this.redis.incr(this.getFailureKey());
-    
-    // Set TTL on the failure key on first failure so it resets over time
-    if (failures === 1) {
-      await this.redis.pexpire(this.getFailureKey(), this.config.recoveryTimeoutMs);
-    }
+    const failures = await this.cache.incrementWithPttl(this.getFailureKey(), this.config.recoveryTimeoutMs);
 
     if (failures >= this.config.failureThreshold) {
       console.warn(`[CircuitBreaker] Failure threshold reached for ${this.providerName}. Opening circuit.`);
-      await this.redis.set(this.getStateKey(), CircuitBreakerState.OPEN);
-      // Reset the failures key TTL to act as the recovery timeout clock
-      await this.redis.pexpire(this.getFailureKey(), this.config.recoveryTimeoutMs);
+      await this.cache.set(this.getStateKey(), CircuitBreakerState.OPEN);
+      // Restart the failures key TTL to act as the recovery timeout clock
+      await this.cache.set(this.getFailureKey(), this.config.failureThreshold.toString(), this.config.recoveryTimeoutMs / 1000);
     }
   }
 
@@ -128,12 +123,12 @@ export class CircuitBreaker {
    * Returns a summary of all active (OPEN or HALF_OPEN) circuit breakers across the gateway.
    */
   static async getActiveBreakers(): Promise<{ provider: string, state: CircuitBreakerState }[]> {
-    const redis = RedisClient.getInstance();
-    const keys = await redis.keys('cb:*:state');
+    const cache = CacheManager.getInstance();
+    const keys = await cache.keys('cb:*:state');
     
     if (keys.length === 0) return [];
     
-    const states = await redis.mget(...keys);
+    const states = await cache.mget(keys);
     const activeBreakers: { provider: string, state: CircuitBreakerState }[] = [];
     
     for (let i = 0; i < keys.length; i++) {

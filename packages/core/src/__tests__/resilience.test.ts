@@ -1,17 +1,13 @@
 import assert from 'node:assert/strict';
 import { beforeEach, describe, it } from 'node:test';
-import RedisMock from 'ioredis-mock';
-import type Redis from 'ioredis';
 import { CircuitBreaker, CircuitBreakerState } from '../circuit-breaker';
 import { RateLimiter } from '../rate-limiter';
-import { RedisClient } from '../redis/client';
-
-const mockRedis = new RedisMock();
-RedisClient.setInstance(mockRedis as unknown as Redis);
+import { CacheManager } from '../cache/CacheManager';
+import { MemoryCache } from '../cache/MemoryCache';
 
 describe('CircuitBreaker', () => {
   beforeEach(async () => {
-    await mockRedis.flushall();
+    CacheManager.setInstance(new MemoryCache());
   });
 
   it('starts in CLOSED state', async () => {
@@ -61,7 +57,7 @@ describe('CircuitBreaker', () => {
 
 describe('RateLimiter', () => {
   beforeEach(async () => {
-    await mockRedis.flushall();
+    CacheManager.setInstance(new MemoryCache());
   });
 
   it('allows requests under limit', async () => {

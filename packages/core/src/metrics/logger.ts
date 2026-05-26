@@ -1,4 +1,4 @@
-import { RedisClient } from '../redis/client';
+import { CacheManager } from '../cache/CacheManager';
 
 export interface RoutingEvent {
   id: string;
@@ -15,54 +15,50 @@ export class MetricsLogger {
   private static readonly OUTPUT_COST_CENTS = 0.000060; // $0.60 per 1M = 60 cents per 1M = 0.000060 per token
 
   static async logEvent(event: RoutingEvent, promptTokens: number = 0, completionTokens: number = 0): Promise<void> {
-    const redis = RedisClient.getInstance();
+    const cache = CacheManager.getInstance();
     
-    const pipeline = redis.pipeline();
+    try {
+      // 1. Increment total requests
+      await cache.increment('freeloader:stats:requests_total');
 
-    // 1. Increment total requests
-    pipeline.incr('freeloader:stats:requests_total');
+      // 2. Increment provider requests
+      await cache.increment(`freeloader:stats:provider:${event.provider}:requests`);
 
-    // 2. Increment provider requests
-    pipeline.incr(`freeloader:stats:provider:${event.provider}:requests`);
+      // 3. Calculate and increment savings in cents
+      const savings = (promptTokens * this.INPUT_COST_CENTS) + (completionTokens * this.OUTPUT_COST_CENTS);
+      if (savings > 0) {
+        await cache.incrementFloat('freeloader:stats:savings_cents', savings);
+      }
 
-    // 3. Calculate and increment savings in cents
-    const savings = (promptTokens * this.INPUT_COST_CENTS) + (completionTokens * this.OUTPUT_COST_CENTS);
-    if (savings > 0) {
-      // Redis INCRBYFLOAT for floating point addition
-      pipeline.incrbyfloat('freeloader:stats:savings_cents', savings);
-    }
-
-    // 4. Push to recent logs (capped at 50)
-    pipeline.lpush('freeloader:logs:recent', JSON.stringify(event));
-    pipeline.ltrim('freeloader:logs:recent', 0, 49);
-
-    await pipeline.exec().catch(err => {
+      // 4. Push to recent logs (capped at 50)
+      await cache.listPush('freeloader:logs:recent', event, 50);
+    } catch (err) {
       console.error('[Freeloader Metrics] Failed to log event:', err);
-    });
+    }
   }
 
   static async getDashboardMetrics(): Promise<any> {
-    const redis = RedisClient.getInstance();
+    const cache = CacheManager.getInstance();
     
     // Fetch total requests
-    const totalRequestsStr = await redis.get('freeloader:stats:requests_total');
+    const totalRequestsStr = await cache.get('freeloader:stats:requests_total');
     const totalRequests = parseInt(totalRequestsStr || '0', 10);
 
     // Fetch estimated savings
-    const savingsStr = await redis.get('freeloader:stats:savings_cents');
+    const savingsStr = await cache.get('freeloader:stats:savings_cents');
     const estimatedSavings = parseFloat(savingsStr || '0') / 100; // Convert cents to dollars
 
     // Fetch recent logs
-    const recentLogsRaw = await redis.lrange('freeloader:logs:recent', 0, 49);
-    const recentLogs = recentLogsRaw.map(log => JSON.parse(log));
+    const recentLogsRaw = await cache.listRange('freeloader:logs:recent', 0, 49);
+    const recentLogs = recentLogsRaw.map(log => typeof log === 'string' ? JSON.parse(log) : log);
 
     // Fetch provider usage (scan for keys)
-    const providerKeys = await redis.keys('freeloader:stats:provider:*:requests');
+    const providerKeys = await cache.keys('freeloader:stats:provider:*:requests');
     const providerUsage: Record<string, number> = {};
     let totalProviderRequests = 0;
 
     if (providerKeys.length > 0) {
-      const counts = await redis.mget(...providerKeys);
+      const counts = await cache.mget(providerKeys);
       providerKeys.forEach((key, i) => {
         const providerName = key.split(':')[3];
         const count = parseInt(counts[i] || '0', 10);

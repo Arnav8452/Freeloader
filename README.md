@@ -164,12 +164,18 @@ CEREBRAS_API_KEY=your_key_here
 OPENROUTER_API_KEY=your_key_here
 
 OLLAMA_BASE_URL=http://localhost:11434
-REDIS_URL=redis://localhost:6379
 FREELOADER_API_KEYS=e4cd5267b2dffeb53ca1dfc0b40e5ecde2e13a0da7ca6b86ceb5853fde420281
+
+# Cache Configuration
+# Use 'memory' for a lightweight, zero-dependency setup (perfect for free-tier containers).
+# Use 'redis' for multi-node, enterprise-grade distributed deployments.
+CACHE_MODE=memory
+# REDIS_URL=redis://localhost:6379 # Required only if CACHE_MODE=redis
 ```
 
-**4. Start Redis**
+**4. Start Infrastructure (If using Redis mode)**
 ```bash
+# Only required if CACHE_MODE=redis
 docker compose up -d
 ```
 
@@ -218,7 +224,7 @@ Then open `http://localhost:3001` in your browser!
 ### Tech Stack
 
 - **Core:** TypeScript, Node.js, Fastify
-- **State & Resilience:** Redis (ioredis), Docker
+- **State & Resilience:** Adaptive Caching (Native Memory Map + ioredis wrappers)
 - **Monorepo:** pnpm workspaces, Turborepo
 - **Dashboard:** Next.js (App Router), TailwindCSS v4
 - **Observability:** OpenTelemetry integration
