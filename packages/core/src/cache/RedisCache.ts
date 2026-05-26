@@ -4,11 +4,15 @@ import { CacheProvider } from './CacheProvider';
 export class RedisCache implements CacheProvider {
   private client: Redis;
 
-  constructor(url?: string) {
-    this.client = new Redis(url || process.env.REDIS_URL || 'redis://localhost:6379', {
-      maxRetriesPerRequest: 3,
-      enableReadyCheck: true,
-    });
+  constructor(clientOrUrl?: string | Redis) {
+    if (clientOrUrl instanceof Redis || (clientOrUrl && typeof clientOrUrl === 'object')) {
+      this.client = clientOrUrl as Redis;
+    } else {
+      this.client = new Redis(clientOrUrl || process.env.REDIS_URL || 'redis://localhost:6379', {
+        maxRetriesPerRequest: 3,
+        enableReadyCheck: true,
+      });
+    }
     
     this.client.on('error', (err) => {
       console.error('[Freeloader Redis Error]', err);
