@@ -179,14 +179,36 @@ export class PipelineOrchestrator {
       const providerRequest = { ...restReq, model: actualModel };
 
       let streamGeneratedBytes = false;
+      const timeoutMs = request.streamTimeoutMs || 30000; // default 30s timeout
+      
+      const timeoutController = new AbortController();
+      let idleTimeout: NodeJS.Timeout | undefined;
+
+      const resetTimeout = () => {
+        if (idleTimeout) clearTimeout(idleTimeout);
+        idleTimeout = setTimeout(() => {
+          timeoutController.abort(new Error(`Stream idle timeout exceeded (${timeoutMs}ms)`));
+        }, timeoutMs);
+      };
+
+      const onClientAbort = () => {
+        timeoutController.abort(new Error('Request aborted by client'));
+      };
+
+      if (signal) {
+        signal.addEventListener('abort', onClientAbort);
+        if (signal.aborted) onClientAbort();
+      }
       
       try {
-        const stream = provider.chatCompletionStream(providerRequest, signal);
+        resetTimeout();
+        const stream = provider.chatCompletionStream(providerRequest, timeoutController.signal);
 
         let promptTokens = 0;
         let completionTokens = 0;
 
         for await (const chunk of stream) {
+          resetTimeout();
           if (!streamGeneratedBytes) {
              streamGeneratedBytes = true; // Once we yield, we CANNOT retry
              // We consider the first successful byte as a success for the breaker
@@ -237,6 +259,9 @@ export class PipelineOrchestrator {
 
         // If we haven't yielded any bytes yet, it's safe to record failure, continue the loop and failover.
         await breaker.recordFailure();
+      } finally {
+        if (idleTimeout) clearTimeout(idleTimeout);
+        if (signal) signal.removeEventListener('abort', onClientAbort);
       }
     }
 

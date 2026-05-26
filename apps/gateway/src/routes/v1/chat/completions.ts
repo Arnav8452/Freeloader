@@ -25,7 +25,13 @@ export default async function (fastify: FastifyInstance) {
       reply.raw.setHeader('Cache-Control', 'no-cache');
       reply.raw.setHeader('Connection', 'keep-alive');
 
+      let heartbeat: NodeJS.Timeout | undefined;
       try {
+        // Send a heartbeat every 15 seconds to keep proxies from closing the connection
+        heartbeat = setInterval(() => {
+          reply.raw.write(': keep-alive\n\n');
+        }, 15000);
+
         const stream = pipeline.executeStream(gatewayReq);
         for await (const chunk of stream) {
           reply.raw.write(`data: ${JSON.stringify(chunk)}\n\n`);
@@ -41,6 +47,7 @@ export default async function (fastify: FastifyInstance) {
           reply.raw.end();
         }
       } finally {
+        if (heartbeat) clearInterval(heartbeat);
         reply.raw.end();
       }
     } else {

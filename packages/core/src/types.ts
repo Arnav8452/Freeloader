@@ -14,6 +14,7 @@ export interface GatewayRequest {
   response_format?: {
     type: 'json_object';
   };
+  streamTimeoutMs?: number;
 }
 
 export interface GatewayStreamChunk {
