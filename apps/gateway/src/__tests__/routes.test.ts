@@ -2,12 +2,10 @@ import { test, describe, before, after } from 'node:test';
 import assert from 'node:assert';
 import fastify, { FastifyInstance } from 'fastify';
 
-import RedisMock from 'ioredis-mock';
-import { RedisClient } from '@freeloaderapi/core';
+import { CacheManager, MemoryCache } from '@freeloaderapi/core';
 
 // Ensure the mock is set up before we import the middleware
-const mockRedis = new RedisMock();
-RedisClient.getInstance = () => mockRedis;
+CacheManager.setInstance(new MemoryCache());
 
 describe('Gateway Routes', () => {
   let app: FastifyInstance;
