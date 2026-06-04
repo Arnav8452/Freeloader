@@ -1,13 +1,14 @@
 import { FastifyInstance } from 'fastify';
 import { PipelineOrchestrator, GatewayRequest } from '@freeloaderapi/core';
-import { GeminiAdapter, GroqAdapter, OpenRouterAdapter, OllamaAdapter, CerebrasAdapter } from '@freeloaderapi/adapters';
+import { GeminiAdapter, GroqAdapter, OpenRouterAdapter, OllamaAdapter, CerebrasAdapter, omniRouteProviders } from '@freeloaderapi/adapters';
 
 const providers = [
   new GeminiAdapter(),
   new GroqAdapter(),
   new CerebrasAdapter(),
   new OpenRouterAdapter(),
-  new OllamaAdapter()
+  new OllamaAdapter(),
+  ...(omniRouteProviders || [])
 ];
 
 // Initialize pipeline with some example weightings

@@ -23,7 +23,8 @@
     "lint": "eslint src/"
   },
   "dependencies": {
-    "@freeloaderapi/core": "workspace:*"
+    "@freeloaderapi/core": "workspace:*",
+    "@freeloaderapi/omniroute-compat": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.4.0"

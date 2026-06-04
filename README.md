@@ -40,6 +40,34 @@ Freeloader then:
 
 ---
 
+## 🚀 New: OmniRoute Integration (56+ Free Tiers & Advanced Features)
+
+Freeloader now natively wraps **OmniRoute**, unlocking access to **over 56 additional free-tier and web-based providers** directly in your gateway!
+
+Instead of maintaining brittle web-scrapers, Freeloader uses a universal `OmniRouteWrapperAdapter` to dynamically load OmniRoute's `BaseExecutor` instances. 
+
+**New Free Tiers Available:**
+- `DuckDuckGoWeb`
+- `HuggingChat`
+- `Phind`
+- `ChatGPT Web`
+- `Claude Web`
+- `DeepSeek Web`
+- `Qwen Web`
+- ...and 50+ more!
+
+**New Advanced Middlewares:**
+- **Idempotency Layer:** Prevents duplicate identical requests from double-processing.
+- **Prompt Caching:** Exact-match caching for `temperature: 0` requests.
+- **PII Sanitization:** Automatically scrubs Personally Identifiable Information from prompts before sending them to third-party providers.
+
+> **Note on Dependencies:** Because the OmniRoute wrapper integrates raw source files, you must install a few native dependencies before starting the gateway:
+> ```bash
+> pnpm add -w xxhash-wasm zod uuid sqlite-vec
+> ```
+
+---
+
 ## Integration Methods
 
 Freeloader is designed as a highly modular monorepo, meaning you can integrate it into your own setup in **three different ways** depending on your architecture:

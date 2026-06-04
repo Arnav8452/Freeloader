@@ -11,11 +11,20 @@ server.register(cors, {
   origin: '*', // Allow dashboard to fetch
 });
 
+import { idempotencyMiddleware } from './middleware/idempotency.js';
+import { piiMiddleware } from './middleware/pii.js';
+import { cacheMiddleware } from './middleware/cache.js';
+
 // Register Auth Middleware globally
 server.addHook('preHandler', async (request, reply) => {
   // Exclude health and metrics endpoints from auth
   if (request.url.startsWith('/health') || request.url.startsWith('/stats')) return;
   await authMiddleware(request, reply);
+  await idempotencyMiddleware(request, reply);
+  if (reply.sent) return; // idempotency might send reply
+  await cacheMiddleware(request, reply);
+  if (reply.sent) return; // cache hit might send reply
+  await piiMiddleware(request, reply);
 });
 
 server.get('/health', async (request, reply) => {
