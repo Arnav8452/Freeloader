@@ -6,7 +6,13 @@ export * from './providers/ollama';
 export * from './providers/cerebras';
 export * from './omniRouteWrapper';
 
-// Temporarily commented out to avoid TS errors if the compat package isn't fully built yet
-// import { executors } from '@freeloaderapi/omniroute-compat/open-sse/executors/index.js';
+// Uncomment this block when compat package is built, or use tsx to run directly
+// import { executors, REGISTRY, getExecutor } from '@freeloaderapi/omniroute-compat';
 // import { OmniRouteWrapperAdapter } from './omniRouteWrapper';
-// export const omniRouteProviders = Object.values(executors).map(executor => new OmniRouteWrapperAdapter(executor));
+// 
+// export const omniRouteProviders = [
+//   // The ~56 Web Scraper executors
+//   ...Object.values(executors).map(executor => new OmniRouteWrapperAdapter(executor)),
+//   // The 120+ standard API LLM providers
+//   ...Object.keys(REGISTRY || {}).map(providerId => new OmniRouteWrapperAdapter(getExecutor(providerId)))
+// ];

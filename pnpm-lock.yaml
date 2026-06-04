@@ -88,14 +88,20 @@ importers:
   apps/gateway:
     dependencies:
       '@fastify/cors':
-        specifier: ^8.5.0
-        version: 8.5.0
+        specifier: ^9.0.1
+        version: 9.0.1
       '@freeloaderapi/adapters':
         specifier: workspace:*
         version: link:../../packages/adapters
       '@freeloaderapi/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@freeloaderapi/omniroute-compat':
+        specifier: workspace:*
+        version: link:../../packages/omniroute-compat
+      dotenv:
+        specifier: ^16.4.5
+        version: 16.6.1
       fastify:
         specifier: ^4.26.1
         version: 4.29.1
@@ -118,6 +124,9 @@ importers:
       '@freeloaderapi/core':
         specifier: workspace:*
         version: link:../core
+      '@freeloaderapi/omniroute-compat':
+        specifier: workspace:*
+        version: link:../omniroute-compat
     devDependencies:
       typescript:
         specifier: ^5.4.0
@@ -135,6 +144,8 @@ importers:
       typescript:
         specifier: ^5.4.0
         version: 5.9.3
+
+  packages/omniroute-compat: {}
 
 packages:
 
@@ -816,8 +827,8 @@ packages:
       fast-uri: 2.4.0
     dev: false
 
-  /@fastify/cors@8.5.0:
-    resolution: {integrity: sha512-/oZ1QSb02XjP0IK1U0IXktEsw/dUBTxJOW7IpIeO8c/tNalw/KjoNSJv1Sf6eqoBPO+TDGkifq6ynFK3v68HFQ==}
+  /@fastify/cors@9.0.1:
+    resolution: {integrity: sha512-YY9Ho3ovI+QHIL2hW+9X4XqQjXLjJqsU+sMV/xFsxZkE8p3GNnYVFpoOxF7SsP5ZL76gwvbo3V9L+FIekBGU4Q==}
     dependencies:
       fastify-plugin: 4.5.1
       mnemonist: 0.39.6
@@ -2308,6 +2319,11 @@ packages:
     dependencies:
       esutils: 2.0.3
     dev: true
+
+  /dotenv@16.6.1:
+    resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
+    engines: {node: '>=12'}
+    dev: false
 
   /dotenv@17.4.2:
     resolution: {integrity: sha512-nI4U3TottKAcAD9LLud4Cb7b2QztQMUEfHbvhTH09bqXTxnSie8WnjPALV/WMCrJZ6UV/qHJ6L03OqO3LcdYZw==}
