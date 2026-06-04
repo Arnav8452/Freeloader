@@ -2,7 +2,6 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": { 
     "moduleResolution": "Node",
-    "allowImportingTsExtensions": true,
     "strict": false,
     "skipLibCheck": true,
     "composite": true,
