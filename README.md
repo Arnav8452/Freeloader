@@ -158,28 +158,45 @@ const response = await client.chat.completions.create({
 Because the core routing logic is decoupled from the Fastify server, you can install the packages directly into your own Next.js or Node.js backend. You can build your own custom gateways using our resilience logic!
 
 ```bash
-npm install @freeloaderapi/core@^0.3.0 @freeloaderapi/adapters@^0.2.1
+npm install @freeloaderapi/core @freeloaderapi/adapters @freeloaderapi/omniroute-compat
 ```
+
+> **Note on Dependencies:** Because the OmniRoute wrapper integrates raw source files, you must also install a few native dependencies in your project:
+> ```bash
+> npm install xxhash-wasm zod uuid sqlite-vec
+> ```
 
 ```typescript
 import { FreeloaderPipeline } from '@freeloaderapi/core';
-import { GeminiAdapter, GroqAdapter, CerebrasAdapter, OpenRouterAdapter } from '@freeloaderapi/adapters';
+import { 
+  GeminiAdapter, 
+  GroqAdapter, 
+  CerebrasAdapter, 
+  OpenRouterAdapter,
+  getOmniRouteProviders
+} from '@freeloaderapi/adapters';
 
-// Instantiate the pipeline natively inside your own server!
-const pipeline = new FreeloaderPipeline({
-  providers: [
-    new GeminiAdapter({ apiKey: process.env.GOOGLE_API_KEY }),
-    new CerebrasAdapter({ apiKey: process.env.CEREBRAS_API_KEY }),
-    new GroqAdapter({ apiKey: process.env.GROQ_API_KEY }),
-    new OpenRouterAdapter({ apiKey: process.env.OPENROUTER_API_KEY })
-  ]
-});
+async function start() {
+  // Dynamically load all 177+ free tier OmniRoute providers
+  const omniRouteProviders = await getOmniRouteProviders();
 
-// Use it directly in your Next.js API routes or Fastify handlers
-const stream = await pipeline.createChatCompletion({
-  model: "gpt-4o-mini",
-  messages: [{ role: "user", content: "Hello!" }]
-});
+  // Instantiate the pipeline natively inside your own server!
+  const pipeline = new FreeloaderPipeline({
+    providers: [
+      new GeminiAdapter({ apiKey: process.env.GOOGLE_API_KEY }),
+      new CerebrasAdapter({ apiKey: process.env.CEREBRAS_API_KEY }),
+      new GroqAdapter({ apiKey: process.env.GROQ_API_KEY }),
+      new OpenRouterAdapter({ apiKey: process.env.OPENROUTER_API_KEY }),
+      ...omniRouteProviders // Inject the free tiers!
+    ]
+  });
+
+  // Use it directly in your Next.js API routes or Fastify handlers
+  const stream = await pipeline.createChatCompletion({
+    model: "gpt-4o-mini", // Auto-maps to DuckDuckGo, Groq, etc.
+    messages: [{ role: "user", content: "Hello!" }]
+  });
+}
 ```
 
 ### 3. One-Click Cloud Deployment
