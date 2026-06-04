@@ -1,20 +1,22 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { IdempotencyLayer } from '@freeloaderapi/omniroute-compat/src/lib/idempotencyLayer.js';
-
-const idempotency = new IdempotencyLayer();
+import { 
+  getIdempotencyKey, 
+  checkIdempotency, 
+  saveIdempotency 
+} from '@freeloaderapi/omniroute-compat/src/lib/idempotencyLayer.ts';
 
 export async function idempotencyMiddleware(request: FastifyRequest, reply: FastifyReply) {
-    const key = request.headers['idempotency-key'] as string;
+    const key = getIdempotencyKey(request.headers);
     if (!key) return; // Optional
 
-    const existing = idempotency.get(key);
-    if (existing) {
-        if (existing.status === 'in-progress') {
+    const cached = checkIdempotency(key);
+    if (cached) {
+        if (cached.status === 409) {
             return reply.status(409).send({ error: 'Request is currently processing' });
         }
-        return reply.send(existing.response);
+        return reply.status(cached.status).send(cached.response);
     }
     
-    idempotency.set(key, { status: 'in-progress' });
+    saveIdempotency(key, { error: 'Request is currently processing' }, 409);
     (request as any).idempotencyKey = key;
 }

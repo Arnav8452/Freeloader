@@ -18,7 +18,7 @@ const DEFAULT_WINDOW_MS = 5000;
 const idempotencyStore = new Map();
 
 // Periodic cleanup every 30s
-let cleanupInterval;
+let cleanupInterval: NodeJS.Timeout | undefined;
 
 function ensureCleanup() {
   if (cleanupInterval) return;
@@ -39,9 +39,9 @@ function ensureCleanup() {
  * @param {Headers|object} headers
  * @returns {string|null}
  */
-export function getIdempotencyKey(headers) {
+export function getIdempotencyKey(headers: any): string | null {
   if (!headers) return null;
-  const get = typeof headers.get === "function" ? (k) => headers.get(k) : (k) => headers[k];
+  const get = typeof headers.get === "function" ? (k: string) => headers.get(k) : (k: string) => headers[k];
   return get("idempotency-key") || get("x-request-id") || null;
 }
 
@@ -50,7 +50,7 @@ export function getIdempotencyKey(headers) {
  * @param {string} key
  * @returns {{ response: object, status: number }|null}
  */
-export function checkIdempotency(key) {
+export function checkIdempotency(key: string): { response: any, status: number } | null {
   if (!key) return null;
   const entry = idempotencyStore.get(key);
   if (!entry) return null;
@@ -68,7 +68,7 @@ export function checkIdempotency(key) {
  * @param {number} status - HTTP status code
  * @param {number} [windowMs=5000] - Dedup window in ms
  */
-export function saveIdempotency(key, response, status, windowMs = DEFAULT_WINDOW_MS) {
+export function saveIdempotency(key: string, response: any, status: number, windowMs = DEFAULT_WINDOW_MS) {
   if (!key) return;
   ensureCleanup();
   idempotencyStore.set(key, {

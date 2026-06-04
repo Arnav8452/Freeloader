@@ -2,16 +2,22 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "composite": true,
-    "module": "CommonJS",
+    "module": "ES2022",
     "moduleResolution": "Node",
     "outDir": "dist",
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@omniroute/*": ["./*"]
     },
     "resolveJsonModule": true,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "allowImportingTsExtensions": true,
+    "noImplicitAny": false,
+    "strict": false,
+    "skipLibCheck": true,
+    "emitDeclarationOnly": true
   },
-  "include": ["open-sse/**/*", "src/**/*"]
+  "include": ["open-sse/**/*", "src/**/*", "index.ts"]
 }
