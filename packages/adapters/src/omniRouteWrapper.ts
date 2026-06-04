@@ -4,7 +4,7 @@ import { BaseAdapter, ProviderError } from './base';
 type ExecuteInput = any;
 interface BaseExecutor {
   getProvider(): string;
-  execute(input: ExecuteInput): Promise<{ response: Promise<Response> }>;
+  execute(input: ExecuteInput): Promise<Response>;
 }
 
 export class OmniRouteWrapperAdapter extends BaseAdapter {
@@ -45,6 +45,7 @@ export class OmniRouteWrapperAdapter extends BaseAdapter {
 
     return {
       model: request.model || 'default-model',
+      messages: request.messages,
       body: {
         messages: request.messages,
         temperature: request.temperature,
@@ -60,8 +61,7 @@ export class OmniRouteWrapperAdapter extends BaseAdapter {
     const input = this.transformRequestToOmniRouteInput(request, signal);
     input.stream = false;
 
-    const result = await this.executor.execute(input);
-    const response = await result.response;
+    const response = await this.executor.execute(input);
     
     if (!response.ok) {
         const errText = await response.text();
@@ -86,8 +86,7 @@ export class OmniRouteWrapperAdapter extends BaseAdapter {
     const input = this.transformRequestToOmniRouteInput(request, signal);
     input.stream = true;
 
-    const result = await this.executor.execute(input);
-    const response = await result.response;
+    const response = await this.executor.execute(input);
     
     if (!response.ok) {
         const errText = await response.text();

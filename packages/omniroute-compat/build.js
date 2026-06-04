@@ -12,7 +12,10 @@ esbuild.build({
   platform: 'node',
   format: 'cjs',
   target: 'node20',
-  logLevel: 'info',
+  inject: ['./inject.js'],
+  define: {
+    'import.meta.url': 'import_meta_url'
+  },
   external: [
     '@aws-sdk/client-bedrock-runtime',
     'yazl',
