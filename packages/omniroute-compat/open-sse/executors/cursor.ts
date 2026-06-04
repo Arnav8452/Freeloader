@@ -247,7 +247,7 @@ const isCloudEnv = () => {
 let http2: typeof import("http2") | null = null;
 if (!isCloudEnv()) {
   try {
-    http2 = await import("http2");
+    http2 = require("node:http2");
   } catch {
     http2 = null;
   }
