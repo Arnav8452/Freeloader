@@ -5,7 +5,9 @@
     "allowImportingTsExtensions": true,
     "strict": false,
     "skipLibCheck": true,
-    "noEmit": true
+    "composite": true,
+    "declaration": true,
+    "outDir": "dist"
   },
   "include": ["src/**/*"],
   "references": [

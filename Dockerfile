@@ -3,6 +3,9 @@ FROM node:20-alpine AS builder
 # Install pnpm
 RUN npm install -g pnpm
 
+# Install Python and build dependencies for native modules (better-sqlite3)
+RUN apk add --no-cache python3 make g++
+
 WORKDIR /app
 
 # Copy the entire workspace
