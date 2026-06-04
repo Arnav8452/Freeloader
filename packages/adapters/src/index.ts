@@ -7,27 +7,23 @@ export * from './providers/cerebras';
 export * from './omniRouteWrapper';
 
 import { OmniRouteWrapperAdapter } from './omniRouteWrapper';
+import { BaseAdapter } from './base';
 
-// Hide the import from the TypeScript compiler to prevent it from parsing 4000+ files
-const compatPkg = '@freeloaderapi/omniroute-compat';
+export async function getOmniRouteProviders(): Promise<BaseAdapter[]> {
+  const compatPkg = '@freeloaderapi/omniroute-compat';
+  try {
+    // @ts-ignore
+    const compat = await import(compatPkg);
+    const executors = compat.executors || {};
+    const REGISTRY = compat.REGISTRY || {};
+    const getExecutor = compat.getExecutor || ((id: string) => null);
 
-let executors: any = {};
-let REGISTRY: any = {};
-let getExecutor: any = (id: string) => null;
-
-try {
-  // @ts-ignore
-  const compat = await import(compatPkg);
-  executors = compat.executors || {};
-  REGISTRY = compat.REGISTRY || {};
-  getExecutor = compat.getExecutor || ((id: string) => null);
-} catch (err) {
-  console.warn("Could not load omniroute-compat dynamically", err);
+    return [
+      ...Object.values(executors).map((executor: any) => new OmniRouteWrapperAdapter(executor)),
+      ...Object.keys(REGISTRY).map((providerId: string) => new OmniRouteWrapperAdapter(getExecutor(providerId)))
+    ];
+  } catch (err) {
+    console.warn("Could not load omniroute-compat dynamically", err);
+    return [];
+  }
 }
-
-export const omniRouteProviders = [
-  // The ~56 Web Scraper executors
-  ...Object.values(executors).map((executor: any) => new OmniRouteWrapperAdapter(executor)),
-  // The 120+ standard API LLM providers
-  ...Object.keys(REGISTRY).map((providerId: string) => new OmniRouteWrapperAdapter(getExecutor(providerId)))
-];

@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { sanitizePII } from '@freeloaderapi/omniroute-compat/src/lib/piiSanitizer.ts';
+import { sanitizePII } from '@freeloaderapi/omniroute-compat/dist/piiSanitizer';
 
 export async function piiMiddleware(request: FastifyRequest, reply: FastifyReply) {
     if (request.method !== 'POST' || !request.body) return;

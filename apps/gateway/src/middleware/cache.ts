@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { getPromptCache, LRUCache } from '@freeloaderapi/omniroute-compat/src/lib/cacheLayer.js';
+import { getPromptCache, LRUCache } from '@freeloaderapi/omniroute-compat/dist/cacheLayer';
 
 export async function cacheMiddleware(request: FastifyRequest, reply: FastifyReply) {
     if (request.method !== 'POST') return;

@@ -1,4 +1,4 @@
-import { executors } from '../../packages/omniroute-compat/index.ts';
+import { executors } from '@freeloaderapi/omniroute-compat/dist/index';
 import { OmniRouteWrapperAdapter } from '../../packages/adapters/src/omniRouteWrapper.ts';
 
 async function test() {

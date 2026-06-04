@@ -1,23 +1,26 @@
 import { FastifyInstance } from 'fastify';
 import { PipelineOrchestrator, GatewayRequest } from '@freeloaderapi/core';
-import { GeminiAdapter, GroqAdapter, OpenRouterAdapter, OllamaAdapter, CerebrasAdapter, omniRouteProviders } from '@freeloaderapi/adapters';
+import { GeminiAdapter, GroqAdapter, OpenRouterAdapter, OllamaAdapter, CerebrasAdapter, getOmniRouteProviders } from '@freeloaderapi/adapters';
 
-const providers = [
-  new GeminiAdapter(),
-  new GroqAdapter(),
-  new CerebrasAdapter(),
-  new OpenRouterAdapter(),
-  new OllamaAdapter(),
-  ...(omniRouteProviders || [])
-];
-
-// Initialize pipeline with some example weightings
-const pipeline = new PipelineOrchestrator(providers, {
-  gemini: 1.5, // Prefer gemini slightly
-  ollama: 0.5  // Fallback
-});
+let pipeline: PipelineOrchestrator;
 
 export default async function (fastify: FastifyInstance) {
+  const omniRouteProviders = await getOmniRouteProviders();
+  
+  const providers = [
+    new GeminiAdapter(),
+    new GroqAdapter(),
+    new CerebrasAdapter(),
+    new OpenRouterAdapter(),
+    new OllamaAdapter(),
+    ...omniRouteProviders
+  ];
+
+  pipeline = new PipelineOrchestrator(providers, {
+    gemini: 1.5,
+    ollama: 0.5
+  });
+
   fastify.post('/v1/chat/completions', async (request, reply) => {
     const gatewayReq = request.body as GatewayRequest;
 

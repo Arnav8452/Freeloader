@@ -6,9 +6,7 @@
     "outDir": "dist",
     "rootDir": "src",
     "baseUrl": ".",
-    "paths": {
-      "@/*": ["../../packages/omniroute-compat/src/*"]
-    }
+    "paths": {}
   },
   "include": ["src/**/*"],
   "references": [

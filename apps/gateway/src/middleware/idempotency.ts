@@ -3,7 +3,7 @@ import {
   getIdempotencyKey, 
   checkIdempotency, 
   saveIdempotency 
-} from '@freeloaderapi/omniroute-compat/src/lib/idempotencyLayer.ts';
+} from '@freeloaderapi/omniroute-compat/dist/idempotencyLayer';
 
 export async function idempotencyMiddleware(request: FastifyRequest, reply: FastifyReply) {
     const key = getIdempotencyKey(request.headers);

@@ -1,8 +1,10 @@
 {
   "name": "@freeloaderapi/omniroute-compat",
   "version": "0.1.0",
-  "main": "index.ts",
+  "main": "dist/index.js",
   "types": "index.ts",
-  "scripts": {},
+  "scripts": {
+    "build": "node build.js"
+  },
   "dependencies": {}
 }
