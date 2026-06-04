@@ -40,21 +40,13 @@ Freeloader then:
 
 ---
 
-## 🚀 New: OmniRoute Integration (56+ Free Tiers & Advanced Features)
+## 🚀 New: OmniRoute Integration
 
-Freeloader now natively wraps **OmniRoute**, unlocking access to **over 56 additional free-tier and web-based providers** directly in your gateway!
+**Auto-fallback across 177 providers in milliseconds. Quota out? Next provider takes over — zero downtime.**
+
+Freeloader now natively wraps **OmniRoute**, unlocking access to **over 177 free-tier and web-based providers** directly in your gateway!
 
 Instead of maintaining brittle web-scrapers, Freeloader uses a universal `OmniRouteWrapperAdapter` to dynamically load OmniRoute's `BaseExecutor` instances. 
-
-**New Free Tiers Available:**
-- `DuckDuckGoWeb`
-- `HuggingChat`
-- `Phind`
-- `ChatGPT Web`
-- `Claude Web`
-- `DeepSeek Web`
-- `Qwen Web`
-- ...and 50+ more!
 
 **New Advanced Middlewares:**
 - **Idempotency Layer:** Prevents duplicate identical requests from double-processing.
@@ -63,39 +55,59 @@ Instead of maintaining brittle web-scrapers, Freeloader uses a universal `OmniRo
 
 ### The "Forever Free" Web Providers (No API Key Required)
 These are providers that OmniRoute reverse-engineers through their web interfaces or public endpoints. They require no credit card and are completely free.
-- **DuckDuckGo Web** (`duckduckgo-web`) - Access to GPT-4o-mini, Claude 3 Haiku, Mixtral, and Llama 3 for free.
-- **HuggingChat** (`huggingchat`) - Access to Llama 3.1 70B, Qwen 2.5 72B, and Cohere Command R+.
+- **DuckDuckGo Web** (`duckduckgo-web`) - GPT-4o-mini, Claude 3 Haiku, Mixtral, Llama 3.
+- **HuggingChat** (`huggingchat`) - Llama 3.1 70B, Qwen 2.5 72B, Cohere Command R+.
 - **ChatGPT Web** (`chatgpt-web`) - Free tier access to ChatGPT web.
-- **Claude Web** (`claude-web`) - Free tier access to Claude 3.5 Sonnet (supports auto-refresh).
+- **Claude Web** (`claude-web`) - Free tier access to Claude 3.5 Sonnet.
 - **DeepSeek Web** (`deepseek-web`) - Free access to DeepSeek V3 and R1.
+- **Qwen Web** (`qwen-web`) - Direct access to Alibaba's Qwen models.
 - **Perplexity Web** (`perplexity-web`) - Free AI search capabilities.
+- **Grok Web** (`grok-web`) - Free tier access to X's Grok.
 - **Phind** (`phind`) - Excellent for coding questions.
 - **Blackbox Web** (`blackbox-web`) - Coding-focused free LLM access.
 - **V0 Vercel Web** (`v0-vercel-web`) - Vercel's UI generation AI.
-- **Qwen Web** (`qwen-web`) - Direct access to Alibaba's Qwen models.
 - **Kimi Web** (`kimi-web`) / **Doubao Web** (`doubao-web`) - Massive context windows.
 - **Poe Web** (`poe-web`) - Access to dozens of models on Poe's free tier.
+- **Copilot Web** (`copilot-web`) - Microsoft Copilot web access.
+- **T3 Chat Web** (`t3-chat-web`) - T3 chat integration.
+- **Muse Spark Web** (`muse-spark-web`) - Muse Spark integration.
+- **Venice Web** (`venice-web`) - Venice AI web integration.
+- **Veo AI Free Web** (`veoaifree-web`) - Veo AI integration.
 
-### High-Performance API Providers (Generous Free Tiers)
-These are standard API providers that give you enterprise-grade reliability and massive free quotas. You just need to create a free account and grab an API key.
-- **Groq** (`groq`) - The fastest inference in the world (Llama 3, Mixtral). Free tier offers ~1,000 requests/day.
-- **Google Gemini** (`gemini`) - Google AI Studio gives you 1,500 requests/day of Gemini 1.5 Flash absolutely free.
-- **Cerebras** (`cerebras`) - Ultra-fast Llama 3 inference. Very generous free usage limits.
-- **SambaNova** (`sambanova`) - Free tier API access to Meta's Llama 3 405B and 70B models!
-- **GitHub Models** (`github`) - Free LLM inference for developers with a GitHub account.
-- **Cohere** (`cohere`) - Offers free "Trial Keys" for their Command R/R+ models for developers.
-- **Mistral** (`mistral`) - Offers free tier limits for developers.
-- **AI21 Labs** (`ai21`) - Offers free trial limits for their Jamba models.
+### IDE Copilots & Dev Tools (Free Tier Access)
+- **Cursor** (`cursor`) - Access Cursor's free backend models.
+- **Windsurf** (`windsurf`) - Access Windsurf's free tier.
+- **Trae** (`trae`) - Trae copilot integration.
+- **Devin CLI** (`devin-cli`) - Devin CLI backend access.
+- **Gemini CLI** (`gemini-cli`) - Gemini CLI access.
+- **GitHub Copilot** (`github`) - GitHub Copilot inference.
+- **GitLab Duo** (`gitlab`) - GitLab Duo inference.
+- **OpenCode** (`opencode`) - OpenCode inference.
+- **Kiro** (`kiro`) - Kiro inference.
+- **Qoder** (`qoder`) - Qoder inference.
 
-### The Aggregators (Access to 100+ Models)
-Aggregators are platforms that host models from *other* providers. Many of them have a dedicated "Free Models" section or give you free signup credits.
-- **OpenRouter** (`openrouter`) - The king of aggregators. They have a massive list of models tagged as `$0.00/token` (mostly Llama, Mistral, and Gemini variants) that you can use indefinitely for free!
-- **Together AI** (`together`) - Aggregator for open-source models. They give you a $5 free credit on signup which lasts a very long time for testing.
-- **DeepInfra** (`deepinfra`) - Extremely cheap aggregator that provides free signup credits.
-- **Fireworks AI** (`fireworks`) - Fast inference for open-source models with free trial limits.
-- **Featherless AI** (`featherless-ai`) - Aggregator for running HuggingFace models.
+### High-Performance API Providers & Aggregators (Generous Free Tiers)
+You just need to create a free account and grab an API key.
+- **Groq** (`groq`) - The fastest inference in the world.
+- **Google Gemini** (`gemini`) - Google AI Studio gives you 1,500 requests/day.
+- **Cerebras** (`cerebras`) - Ultra-fast Llama 3 inference.
+- **SambaNova** (`sambanova`) - Free tier API access to Meta's Llama 3 405B.
+- **Cohere** (`cohere`) - Offers free "Trial Keys".
+- **OpenRouter** (`openrouter`) - The king of aggregators. Massive list of `$0.00/token` models.
+- **Together AI** (`together`) - Aggregator for open-source models with free credits.
+- **DeepInfra** (`deepinfra`) - Extremely cheap aggregator with free signup credits.
+- **Fireworks AI** (`fireworks`) - Fast inference with free trial limits.
+- **Featherless AI** (`featherless-ai`) - Aggregator for HuggingFace models.
 - **Novita AI** (`novita`) - Aggregator for cheap/free inference.
 - **Glhf.chat** (`glhf`) - Free tier access to open-source models.
+- **NLPCloud** (`nlpcloud`) - NLP Cloud free tier models.
+- **Pollinations** (`pollinations`) - Free image and text generation.
+- **Puter** (`puter`) - Puter integration.
+- **NineRouter** (`ninerouter`) - NineRouter aggregator.
+- **Kie** (`kie`) - Kie provider.
+- **Inner AI** (`inner-ai`) - Inner AI provider.
+- **GLM** (`glm`) - ChatGLM provider.
+- **Adapta Web** (`adapta-web`) - Adapta provider.
 
 > **Note on Dependencies:** Because the OmniRoute wrapper integrates raw source files, you must install a few native dependencies before starting the gateway:
 > ```bash
