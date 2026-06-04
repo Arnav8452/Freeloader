@@ -12,7 +12,6 @@ import { BaseAdapter } from './base';
 export async function getOmniRouteProviders(): Promise<BaseAdapter[]> {
   const compatPkg = '@freeloaderapi/omniroute-compat';
   try {
-    // @ts-expect-error
     const compat = await import(compatPkg);
     const executors = compat.executors || {};
     const REGISTRY = compat.REGISTRY || {};
