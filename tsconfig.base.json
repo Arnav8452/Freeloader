@@ -1,20 +1,22 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "ESNext",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ES2022",
+    "lib": ["ES2024", "DOM", "DOM.Iterable"],
     "declaration": true,
     "sourceMap": true,
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "baseUrl": ".",
     "paths": {
-      "@freeloaderapi/*": ["packages/*/dist"]
+      "@freeloaderapi/*": ["packages/*/dist"],
+      "@/*": ["packages/omniroute-compat/src/*"],
+      "@omniroute/*": ["packages/omniroute-compat/*"]
     }
   }
 }

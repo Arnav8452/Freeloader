@@ -1,7 +1,11 @@
 import { IProvider, ProviderCapability, GatewayRequest, GatewayResponse, GatewayStreamChunk } from '@freeloaderapi/core';
 import { BaseAdapter, ProviderError } from './base';
-// We import BaseExecutor type from omniroute-compat to wrap it
-import type { BaseExecutor, ExecuteInput } from '@freeloaderapi/omniroute-compat/open-sse/executors/base.ts';
+// Avoid importing from omniroute-compat directly to prevent TS tracing issues
+type ExecuteInput = any;
+interface BaseExecutor {
+  getProvider(): string;
+  execute(input: ExecuteInput): Promise<{ response: Promise<Response> }>;
+}
 
 export class OmniRouteWrapperAdapter extends BaseAdapter {
   readonly name: string;
