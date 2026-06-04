@@ -3,8 +3,8 @@ FROM node:20-alpine AS builder
 # Install pnpm
 RUN npm install -g pnpm
 
-# Install Python and build dependencies for native modules (better-sqlite3)
-RUN apk add --no-cache python3 make g++
+# Install build dependencies including Python and setuptools (for distutils in Python 3.12)
+RUN apk add --no-cache python3 py3-setuptools make g++
 
 WORKDIR /app
 
