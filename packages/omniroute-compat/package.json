@@ -1,6 +1,9 @@
 {
   "name": "@freeloaderapi/omniroute-compat",
   "version": "0.1.0",
+  "publishConfig": {
+    "access": "public"
+  },
   "main": "dist/index.js",
   "types": "index.ts",
   "scripts": {
