@@ -1,3 +1,5 @@
+
+
 # Freeloader
 
 **An OpenAI-compatible AI inference gateway optimized for cost efficiency.**
@@ -181,7 +183,7 @@ async function start() {
   const omniRouteProviders = await getOmniRouteProviders();
 
   // Instantiate the pipeline natively inside your own server!
-  const pipeline = new FreeloaderPipeline({
+  const pipeline = new PipelineOrchestrator({
     providers: [
       new GeminiAdapter({ apiKey: process.env.GOOGLE_API_KEY }),
       new CerebrasAdapter({ apiKey: process.env.CEREBRAS_API_KEY }),
